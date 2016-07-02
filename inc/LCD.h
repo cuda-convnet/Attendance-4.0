@@ -18,9 +18,9 @@ class LCD {
 	private:
 		I2C i2c;
 	public:
-		LCD(int address);
+		LCD(int);
 		~LCD();
-		void writeString(std::string message, int offset);
+		void writeString(std::string, int);
 };
 
 

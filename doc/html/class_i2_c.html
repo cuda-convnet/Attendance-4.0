@@ -95,16 +95,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa6d748bcd448d8343c803ca17ad3a7ea"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i2_c.html#aa6d748bcd448d8343c803ca17ad3a7ea">I2C</a> (char *file)</td></tr>
-<tr class="separator:aa6d748bcd448d8343c803ca17ad3a7ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27cbfcfd33a3f275d6a259b92bbd2a21"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i2_c.html#a27cbfcfd33a3f275d6a259b92bbd2a21">I2C</a> (char *, int)</td></tr>
+<tr class="separator:a27cbfcfd33a3f275d6a259b92bbd2a21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afaad09fa9bdd23623bddbdcd7585a9fe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i2_c.html#afaad09fa9bdd23623bddbdcd7585a9fe">~I2C</a> ()</td></tr>
 <tr class="separator:afaad09fa9bdd23623bddbdcd7585a9fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93a4ef6c66595b958b221fa641b7cda4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i2_c.html#a93a4ef6c66595b958b221fa641b7cda4">write</a> (char *)</td></tr>
+<tr class="separator:a93a4ef6c66595b958b221fa641b7cda4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="class_i2_c.html">I2C</a> Header Provides the class definition for the <a class="el" href="class_i2_c.html">I2C</a> class</p>
 <p><a class="el" href="class_i2_c.html">I2C</a> Interface Class Provides means for communication with <a class="el" href="class_i2_c.html">I2C</a> devices </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa6d748bcd448d8343c803ca17ad3a7ea"></a>
+<a class="anchor" id="a27cbfcfd33a3f275d6a259b92bbd2a21"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -112,8 +114,18 @@ Public Member Functions</h2></td></tr>
           <td class="memname">I2C::I2C </td>
           <td>(</td>
           <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>file</em></td><td>)</td>
+          <td class="paramname"><em>file</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>addr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -121,9 +133,11 @@ Public Member Functions</h2></td></tr>
 <p><a class="el" href="class_i2_c.html">I2C</a> Class Constructor. Opens and prepares the i2c device for use by the application </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">file</td><td>Path to the i2c device file </td></tr>
+    <tr><td class="paramname">addr</td><td><a class="el" href="class_i2_c.html">I2C</a> address of the target device </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Implement proper error checking and handling </dd></dl>
 
 </div>
 </div>
@@ -140,6 +154,31 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p><a class="el" href="class_i2_c.html">I2C</a> Class Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a93a4ef6c66595b958b221fa641b7cda4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool I2C::write </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Write Method. Writes the given information to the i2c channel </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The data to be written to the <a class="el" href="class_i2_c.html">I2C</a> device </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success, False on failure </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>There's a better way to do this </dd></dl>
 
 </div>
 </div>

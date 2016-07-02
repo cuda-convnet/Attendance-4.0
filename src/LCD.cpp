@@ -4,8 +4,6 @@
 
 #include "../inc/LCD.h"
 
-#define I2C_FILE_LOCATION	"/dev/i2c"
-
 /*!	LCD Class Constructor
  * 	Opens an I2C connection, and prepares for sending standard I2C display
  * 	commands to the address specified by \c address
