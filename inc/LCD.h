@@ -1,8 +1,3 @@
-/*!	LCD Header
- * 	Provides the class definition for the LCD class
- * 	@todo Write better documentation
- */
-
 //Duplicate inclusion protection
 #ifndef LCD_H_
 #define LCD_H_
@@ -13,6 +8,7 @@
 
 /*!	LCD Control Class
  * 	Provides means to interface and control an I2C LCD display
+ * 	@todo Write code and documentation
  */
 class LCD {
 	private:

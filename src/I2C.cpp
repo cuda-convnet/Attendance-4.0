@@ -1,7 +1,3 @@
-/*!	I2C Class.
- * 	Method definitions for the I2C class
- */
-
 #include "../inc/I2C.h"
 #include <ioctl.h>
 

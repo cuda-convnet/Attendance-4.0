@@ -1,7 +1,3 @@
-/*!	LCD Class
- * 	Method definitions for the LCD class
- */
-
 #include "../inc/LCD.h"
 
 /*!	LCD Class Constructor

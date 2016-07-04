@@ -1,7 +1,3 @@
-/*!	I2C Header
- * 	Provides the class definition for the I2C class
- */
-
 //Duplicate inclusion protection
 #ifndef I2C_H_
 #define I2C_H_
