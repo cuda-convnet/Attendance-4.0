@@ -5,9 +5,11 @@
  *      Author: Nicholas
  */
 
-#include "../inc/LCD.h"
+#include "../inc/mod/LCD.h"
+#include "../inc/mod/Buzzer.h"
+#include "../inc/mod/Keypad.h"
+#include "../inc/mod/RFID.h"
 
-#define LCD_I2C_ADDR		0x10
 
 //Main method
 int main() {
