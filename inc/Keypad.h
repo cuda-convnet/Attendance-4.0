@@ -10,8 +10,8 @@
 class Keypad {
 	private:
 	public:
-		Keypad();
-		~Keypad();
+		static bool init();
+		static void destroy();
 };
 
 #endif /* KEYPAD_H_ */

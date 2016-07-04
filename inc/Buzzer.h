@@ -9,8 +9,8 @@
 class Buzzer {
 	private:
 	public:
-		Buzzer();
-		~Buzzer();
+		static bool init();
+		static void destroy();
 };
 
 #endif /* BUZZER_H_ */

@@ -7,11 +7,9 @@
  */
 class I2C {
 	private:
-		int i2cFileHandle;
 	public:
-		I2C(char*, int);
-		~I2C();
-		bool write(char*);
+		static bool init();
+		static void destroy();
 };
 
 #endif /* I2C_H_ */

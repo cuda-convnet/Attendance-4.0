@@ -12,11 +12,9 @@
  */
 class LCD {
 	private:
-		I2C i2c;
 	public:
-		LCD(int);
-		~LCD();
-		void writeString(std::string, int);
+		static bool init();
+		static void destroy();
 };
 
 
