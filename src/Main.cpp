@@ -5,16 +5,34 @@
  *      Author: Nicholas
  */
 
-#include "../inc/mod/LCD.h"
-#include "../inc/mod/Buzzer.h"
-#include "../inc/mod/Keypad.h"
-#include "../inc/mod/RFID.h"
+#include "../inc/device/LCD.h"
+#include "../inc/device/Buzzer.h"
+#include "../inc/device/Keypad.h"
+#include "../inc/device/RFID.h"
 
 
 //Main method
 int main() {
-	//Initialize the LCD
-	LCD lcd = LCD(LCD_I2C_ADDR);
+	//Initialize hardware components
+	if(!LCD::init()) {
+		printf("Failed to initialize LCD (%i)", LCD::error);
+		return;
+	}
+
+	if(!Buzzer::init()) {
+		printf("Failed to initialize Buzzer (%i)", Buzzer::error);
+		return;
+	}
+
+	if(!Keypad::init()) {
+		printf("Failed to initialize Keypad (%i)", Keypad::error);
+		return;
+	}
+
+	if(!RFID::init()) {
+		printf("Failed to initialize RFID (%i)", RFID::error);
+		return;
+	}
 }
 
 /*!
