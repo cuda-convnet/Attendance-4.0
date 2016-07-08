@@ -3,32 +3,38 @@
 
 #include <stdio.h>
 #include <stdexcept>
-
-#define KP_0	RPI_GPIO_P1_15
-#define KP_1	RPI_GPIO_PIN_1
-#define KP_2	RPI_GPIO_PIN_2
-#define KP_3	RPI_GPIO_PIN_3
-#define KP_4	RPI_GPIO_PIN_4
-#define KP_5	RPI_GPIO_PIN_5
-#define KP_6	RPI_GPIO_PIN_6
-#define KP_7	RPI_GPIO_PIN_7
-#define KP_8	RPI_GPIO_PIN_8
-#define KP_9	RPI_GPIO_PIN_9
-#define KP_E	RPI_GPIO_PIN_10
-#define KP_C	RPI_GPIO_PIN_11
+#include <bcm2835.h>
 
 namespace Keypad {
 
 	//Key mapping
-	int map[] {
-			RPI_GPIO_P1_15
+	int keymap[] {
+			RPI_GPIO_P1_15,	//1
+			RPI_GPIO_P1_15,	//2
+			RPI_GPIO_P1_15,	//3
+			RPI_GPIO_P1_15,	//4
+			RPI_GPIO_P1_15,	//5
+			RPI_GPIO_P1_15,	//6
+			RPI_GPIO_P1_15,	//7
+			RPI_GPIO_P1_15,	//8
+			RPI_GPIO_P1_15,	//9
+			RPI_GPIO_P1_15,	//0
+			RPI_GPIO_P1_15,	//Enter
+			RPI_GPIO_P1_15	//Clear
 	};
 
 	void init() {
 		//Initialize the keypad
 		printf("[" WHITE "----" RESET "] Initializing Keypad...");
 
-		//Set mode for each key
+		//Configure each key
+		for(unsigned int i = 0; i < sizeof(keymap) / sizeof(int); i++) {
+			//Set to input
+			bcm2835_gpio_fsel(keymap[i], BCM2835_GPIO_FSEL_INPT);
+			//Set to pull-down
+			bcm2835_gpio_set_pud(keymap[i], BCM2835_GPIO_PUD_DOWN);
+		}
+
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
 	}
