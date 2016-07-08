@@ -5,8 +5,9 @@ OBJ_DIR =../obj/
 BIN_DIR =../bin/
 
 #Compiler options
-COMPILER	=gcc
-CFLAGS		=-c -Wall
+COMPILER	=g++
+CFLAGS		=-c -Wall -std=c++11
+FLAGS		=-fexceptions -lbcm2835
 
 #Output options
 BIN_NAME =attendance
@@ -20,8 +21,8 @@ all: $(BIN_NAME)
 
 #Compiles object files
 $(OBJ_DIR)%.o: %.cpp $(HEADERS)
-	$(COMPILER) -o $@ $(CFLAGS) $<
+	$(COMPILER) -o $@ $(CFLAGS) $(FLAGS) $<
 
 #Compiles the main binary
 $(BIN_NAME): $(OBJECTS)
-	$(COMPILER) $(OBJECTS) -o $(BIN_DIR)$@
+	$(COMPILER) $(OBJECTS) $(FLAGS) -o $(BIN_DIR)$@

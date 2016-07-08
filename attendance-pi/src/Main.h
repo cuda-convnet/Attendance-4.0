@@ -1,10 +1,8 @@
 #pragma once
 
-namespace LCD {
+namespace Main {
 
 	void init();
 	void destroy();
-
-	void writeMessage(char*, int);
 
 }
