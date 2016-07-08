@@ -6,3 +6,19 @@ attendance-pi/.project
 attendance-pi/.settings/
 attendance-pi/bin/
 attendance-pi/obj/
+
+# Visual Studio
+.vs
+ARM
+*.sdf
+*.sln
+*.startup.suo
+*.VC.opendb
+attendance-pi/ARM
+attendance-pi/Assets
+attendance-pi/Debug
+attendance-pi/Release
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.bat
