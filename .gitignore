@@ -22,3 +22,5 @@ attendance-pi/Release
 *.vcxproj.filters
 *.vcxproj.user
 *.bat
+
+attendance-pi/bcm2835
