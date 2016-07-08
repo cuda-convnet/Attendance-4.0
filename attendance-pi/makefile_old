@@ -1,0 +1,30 @@
+INCLUDE_DIR=inc
+OBJ_DIR=obj
+SRC_DIR=src
+HEADER_DIR=src
+BUILD_DIR=build
+
+COMPILER=gcc
+BINARY_NAME=attendance
+
+CFLAGS=-I$(INCLUDE_DIR)
+
+#finds all sources and objects
+SOURCES := $(shell find $(SRC_DIR) -name '*.cpp')
+HEADERS := $(shell find $(HEADER_DIR) -name '*.h')
+OBJECTS := $(subst $(SRC_DIR),$(BUILD_DIR),$(SOURCES:%.cpp=%.o))
+
+all: $(BINARY_NAME)
+
+$(BINARY_NAME): $(OBJECTS)
+	$(COMPILER) $(CFLAGS) $(OBJECTS) -o $(BINARY)
+
+$(OBJECTS): $(SRC_DIR)/%.c
+	$(COMPILER) $(CFLAGS) -I$(HEADER_DIR) -I$(dir $<) -c $< -o $@
+	
+$(SOURCES): $(OBJ_DIR)/%.c
+	$(COMPILES) $(CFLAGS) -I$(HEADER)D
+	
+.PHONY: list
+list:
+	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | xargs

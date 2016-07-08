@@ -1,4 +1,8 @@
-.settings/**
-Debug
-.cproject
-.project
+.metadata/
+RemoteSystemsTempFiles/
+attendance-pi/.gitignore
+attendance-pi/.cproject
+attendance-pi/.project
+attendance-pi/.settings/
+attendance-pi/bin/
+attendance-pi/obj/
