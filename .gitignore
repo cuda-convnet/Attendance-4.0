@@ -1,0 +1,6 @@
+.metadata/
+RemoteSystemsTempFiles/
+attendance-pi/.gitignore
+attendance-pi/.cproject
+attendance-pi/.project
+attendance-pi/.settings/
