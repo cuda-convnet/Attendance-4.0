@@ -6,11 +6,13 @@ namespace LCD {
 	void destroy();
 
 	void writeMessage(char*, int);
+	void writeChar(char);
 
+	void write(char);
 	int writeRaw(char);
-	int writeRaw2(bool,bool,bool,bool,bool,bool,bool,bool);
 
 	void clear();
+	void home();
 	void goTo(int);
 
 	char encodeChar(char);

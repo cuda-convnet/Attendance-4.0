@@ -8,10 +8,9 @@
 
 #define I2C_SLAVE_ADDRESS	0x27
 
-#define ENABLE_BIT	0b00000100
-
-#define BACKLIGHT_ON	0b00001000;
-#define ENABLE_ON		0b00000100;
+#define BACKLIGHT_BIT	0b00001000
+#define ENABLE_BIT		0b00000100
+#define REGSELECT_BIT	0b00000001
 
 /*	I2C MESSAGE STRUCTURE
  *
@@ -20,7 +19,7 @@
 namespace LCD {
 
 	bool backlight = false;
-	bool registerSelect = false;
+	bool regSelect = false;
 	bool readWrite = false;
 
 	void init() {
@@ -37,18 +36,29 @@ namespace LCD {
 		//Set the display slave address
 		bcm2835_i2c_setSlaveAddress(I2C_SLAVE_ADDRESS);
 
-		//Set some other bullshit
+		//Set display to command mode
+		regSelect = false;
+		//Send the initialization data
+		write(0b0010);	usleep(5000);	//Set mode to 4-bit
+		write(0b1000);	usleep(5000);	//Set to 2 line, 5x8 character mode
 
+		write(0b0000);
+		write(0b1000);	usleep(5000);	//Set display off, cursor off, and blink off
 
-		//Blink the screen on and off a few times because reasons
-		for(int i = 0; i < 1; i++) {
-			int a = writeRaw2(false,false,false,false,true,false,false,false);
-			printf("Turn on: %i\n", a);
-			usleep(1000000);
-			int b = writeRaw2(false,false,false,false,false,false,false,false);
-			printf("Turn off: %i\n", b);
-			usleep(1000000);
-		}
+		write(0b0000);
+		write(0b0001);	usleep(5000);	//Clear display and move cursor home
+
+		write(0b0000);
+		write(0b0110);	usleep(5000);	//Set cursor to increment right, don't shift screen
+
+		write(0b0000);
+		write(0b1100);	usleep(5000);	//Turn the display back on
+
+		//Turn the backlight on
+		backlight = true;
+
+		//Test message
+		writeMessage("TESTING TESTING",0);
 
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
@@ -64,16 +74,44 @@ namespace LCD {
 		printf("\r[" GREEN "OKAY\n" RESET);
 	}
 
-	/*	BYTE FORMAT:
-	 *	7 - E
-	 *	6 - Backlight
-	 *	5 - R/@
-	 *	4 - RS
-	 *	3 - Q7
-	 *	2 - Q6
-	 *	1 - Q5
-	 *	0 - Q4
-	 */
+	//Writes a 4 bit message to the LCD
+	void write(char byte) {
+		//Shift the byte
+		byte = byte << 4;
+
+		//Set the backlight bit
+		if(backlight) { byte += BACKLIGHT_BIT; }
+		//Set the register select bit
+		if(regSelect) { byte += REGSELECT_BIT; }
+
+		//Write low
+		writeRaw(byte);
+		usleep(1500);
+
+		//Write high
+		writeRaw(byte | ENABLE_BIT);
+		usleep(1500);
+
+		//Write low
+		writeRaw(byte);
+		usleep(1500);
+	}
+
+	//Writes a character to the LCD
+	void writeChar(char c) {
+		//Get the character code
+		char ccode = encodeChar(c);
+		//Split the character into two messages
+		char m1 = (ccode & 0b11110000) >> 4;
+		char m2 = (ccode & 0b00001111);
+		//Set mode to character
+		regSelect = true;
+		//Write the two messages
+		write(m1);
+		write(m2);
+	}
+
+	//Writes a raw 8 bit message to the expander
 	int writeRaw(char byte) {
 		//Convert to character array
 		char message[] { byte };
@@ -81,16 +119,7 @@ namespace LCD {
 		return bcm2835_i2c_write(message, 1);
 	}
 
-	/*	a =
-	 * 	b =
-	 * 	c =
-	 * 	d =
-	 * 	e = Backlight
-	 * 	f = Enable
-	 * 	g = RW (Read/Write)
-	 * 	h = RS (REgister Select)
-	 */
-	int writeRaw2(bool a, bool b, bool c, bool d, bool e, bool f, bool g, bool h) {
+	/*int writeRaw2(bool a, bool b, bool c, bool d, bool e, bool f, bool g, bool h) {
 		//Create the character
 		char byte;
 		//Add the bits to it
@@ -104,15 +133,35 @@ namespace LCD {
 		if(h) { byte += 0b00000001; }	//Register Select
 		//Write the raw character
 		return writeRaw(byte);
-	}
+	}*/
 
 	void writeMessage(char* message, int offset) {
-		//I do not remember how to write messages to the lcd
+		//Encode the message
+		int i = 0;
+		while(true) {
+			//Check if end of message
+			if(message[i] == '\0') { return; }
+			//Write encoded character
+			writeChar(message[i]);
+			//Increment counter
+			i++;
+		}
 	}
 
 	void clear() {
-		//Write clear command to i2c
-		writeRaw(0b00000001);
+		//Set mode to command
+		regSelect = false;
+		//Send the command
+		write(0b0000);
+		write(0b0001);
+	}
+
+	void home() {
+		//Set mode to command
+		regSelect = false;
+		//Send the command
+		write(0b0000);
+		write(0b0010);
 	}
 
 	char encodeChar(char c) {
