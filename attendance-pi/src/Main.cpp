@@ -18,7 +18,7 @@ int main() {
 
 	} catch(const std::runtime_error& e) {
 		//Catch the error
-		printf("[" RED "ERROR" RESET "] %s\n" RESET, e.what());
+		printf("[" RED "ERR " RESET "] %s\n" RESET, e.what());
 	}
 }
 
