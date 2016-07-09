@@ -2,6 +2,7 @@
 #include "LCD.h"
 #include "GPIO.h"
 #include "Keypad.h"
+#include "RFID.h"
 #include "ANSI.h"
 
 #include <stdio.h>
@@ -15,6 +16,7 @@ int main() {
 		LCD::init();
 		GPIO::init();
 		Keypad::init();
+		RFID::init();
 
 	} catch(const std::runtime_error& e) {
 		//Catch the error
