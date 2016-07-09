@@ -12,7 +12,7 @@ namespace RFID {
 	 */
 	struct RFIDPollResult {
 		bool success;
-		string uid;
+		std::string uid;
 	};
 
 	/*
