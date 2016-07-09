@@ -18,7 +18,6 @@ int main() {
 		GPIO::init();
 		Keypad::init();
 		RFID::init();
-
 	} catch(const std::runtime_error& e) {
 		//Catch the error
 		printf("[" RED "ERR " RESET "] %s\n" RESET, e.what());

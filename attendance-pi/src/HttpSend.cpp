@@ -21,13 +21,14 @@ using std::stringstream;
 namespace HttpSend {
 
 #define HTTP_DOMAIN "sampletext.com"
-#define HTTP_PATH "/authenticate"
+#define HTTP_PATH "/authenticate.php"
 
 	mutex requestMutex;
 	stringstream responseData;
 
 	void headersReady(const HttpResponse *response, void *additionalParams) {
-		printf("[" WHITE "----" RESET "] HTTP Status: %d - %s\n", response->getStatus(), response->getReason());
+		printf("\r[" WHITE "----" RESET "] HTTP Status: %d - %s                ",
+			response->getStatus(), response->getReason());
 		responseData.str(string());
 	}
 
@@ -36,7 +37,7 @@ namespace HttpSend {
 	}
 
 	void responseComplete(const HttpResponse *response, void *additionalParams) {
-		printf("[" WHITE "----" RESET "] Http complete");
+		printf("\r[" WHITE "----" RESET "] Http complete                        ");
 	}
 
 	string authenticateUser(string userid) {
@@ -60,7 +61,7 @@ namespace HttpSend {
 			request.processRequest();
 		}
 
-		printf("\r[" GREEN "OKAY" RESET "] HttpSend user authenticated\n");
+		printf("\r[" GREEN "OKAY" RESET "] HttpSend user authenticated            \n");
 
 		return responseData.str();
 	}
