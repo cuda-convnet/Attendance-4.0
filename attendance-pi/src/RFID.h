@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+
+using std::string;
+
 namespace RFID {
 	/**
 	 * The result of polling for a nearby RFID tag
