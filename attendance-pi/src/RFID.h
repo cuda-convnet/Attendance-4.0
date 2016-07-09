@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace RFID {
 	/**
 	 * The result of polling for a nearby RFID tag
@@ -8,7 +10,7 @@ namespace RFID {
 	 */
 	struct RFIDPollResult {
 		bool success;
-		string uid;
+		std::string uid;
 	};
 
 	/*
