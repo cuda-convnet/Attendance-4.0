@@ -16,6 +16,7 @@ namespace RFID {
 	void init() {
 		printf("[" WHITE "----" RESET "] Initializing RFID...");
 
+		// initialize MFRC522 library
 		mfrc = new MFRC522();
 		mfrc->PCD_Init();
 
@@ -25,27 +26,25 @@ namespace RFID {
 	void destroy() {
 		printf("[" WHITE "----" RESET "] Destroy RFID...");
 
+		// clean up MFRC522 library and SPI
 		delete mfrc;
 		bcm2835_spi_end();
 
 		printf("\r[" GREEN "OKAY\n" RESET);
 	}
 
-	struct RFIDPollResult {
-		bool success;
-		string uid;
-	};
-
 	RFIDPollResult pollForUID() {
 		if (!mfrc->PICC_IsNewCardPresent()) {
 			return{ false, "" };
 		}
 
+		// read the UID of the card, which will be stored in mfrc->uid
 		if (!mfrc->PICC_ReadCardSerial()) {
 			printf("[" YELLOW "WARN" RESET "] RFID failed to read card");
 			return{ false, "" };
 		}
 
+		// convert the UID to space-separated hex bytes
 		stringstream ss;
 		// Get UID
 		for (int i = 0; i < mfrc->uid.size; ++i) {
