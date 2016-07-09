@@ -32,6 +32,8 @@ namespace LCD {
 		//Destroy the LCD
 		printf("[" WHITE "----" RESET "] Destroying LCD...");
 
+		bcm2835_i2c_end();
+
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
 	}
