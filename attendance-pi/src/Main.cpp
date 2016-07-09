@@ -56,3 +56,15 @@ namespace Main {
 		printf("\r[" GREEN "OKAY\n" RESET);
 	}
 }
+
+/*!	@mainpage Ligerbots Attendance System Documentation
+ *
+ * 	Ooh, look at this nifty chart!
+ *
+ * 	@image html main_flow.png
+ *
+ * 	Additional documentation for each of the primary modules is available under
+ * 	their dedicated page. To see this documentation, click the "Namespaces"
+ * 	tab at the top of the screen.
+ *
+ */

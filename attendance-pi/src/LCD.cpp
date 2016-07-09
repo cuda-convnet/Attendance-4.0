@@ -10,20 +10,57 @@
 
 #define BACKLIGHT_BIT	0b00001000
 #define ENABLE_BIT		0b00000100
+#define RDWR_BIT		0b00000010
 #define REGSELECT_BIT	0b00000001
 
-/*!	@section Initialization
+/*!	@section mod_init Module Initialization
  *
  * 	The initialization process for the LCD module first attempts to initialize
  * 	the bcm2835's I2C interface, and if successful, proceeds to the
  * 	configuration of the LCD module itself.  If the I2C initialization fails,
  * 	the method throws an exception of type std::runtime_error().  The process
  * 	for initializing the LCD module involves shifting the device into 4-bit
- * 	mode, specifying the character mode, and specifying other miscelaneous
+ * 	mode, specifying the character mode, and specifying other miscellaneous
  * 	operating parameters.
  *
  * 	@image html lcd_flow.png
  *
+ *	@section lcd_init LCD Initialization
+ *
+ *	The LCD must be properly initialized before it can be used. Initialization
+ *	configures the device to use a 4-bit communication model instead of the
+ *	standard 8-bit one. The initialization process also configures settings on
+ *	the device such as disabling the blinking cursor, hiding the cursor
+ *	altogether, and disabling scrolling.
+ *
+ *	@section lcd_hwdoc LCD Communication Protocol
+ *
+ *	Following initialization, the LCD is set to operate in 4-bit mode.  The
+ *	4 bits used for communication correspond to the higher 4 bits of the raw
+ *	i2c message, as shown in the below chart:
+ *
+ *	@image html lcd_cmdbyte.png
+ *
+ *	The <b>BL</b> bit is used to determine weather or not the display's LED
+ *	backlight should be turned on or off.<br>
+ *	The <b>EN</b> bit is used to "push" the state of D1-D4 into the memory of
+ *	the LCD controller.  After data has been written to pins D1-D4, the EN pin
+ *	is pulled high momentarily to instruct the controller to read the 4 bits
+ *	available.<br>
+ *	The <b>R/W</b> bit is used to change the device between read and write
+ *	mode.<br>
+ *	The <b>RS</b> bit selects the target register to write data to.  When high,
+ *	data is interpreted as a command, such as clear or go home.  When low, data
+ *	is interpreted as a character.
+ *
+ *	Because the LCD requires 8 bits of data to perform an action, the command
+ *	is split in half, with the higher 8 bits being sent first, followed by the
+ *	second immediately after.
+ *
+ *	More complete documentation of the commands and character codes used by the
+ *	LCD module can be found on its datasheet, which can be found
+ *	<a href="https://www.sparkfun.com/datasheets/LCD/GDM1602K-Extended.pdf">
+ *	here</a>
  */
 namespace LCD {
 
