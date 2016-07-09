@@ -5,7 +5,7 @@ namespace LCD {
 	void init();
 	void destroy();
 
-	void writeMessage(char*, int);
+	void writeMessage(char*);
 	void writeChar(char);
 
 	void write(char);

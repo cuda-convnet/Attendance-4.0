@@ -12,16 +12,33 @@
 #define ENABLE_BIT		0b00000100
 #define REGSELECT_BIT	0b00000001
 
-/*	I2C MESSAGE STRUCTURE
+/*!	@section Initialization
+ *
+ * 	The initialization process for the LCD module first attempts to initialize
+ * 	the bcm2835's I2C interface, and if successful, proceeds to the
+ * 	configuration of the LCD module itself.  If the I2C initialization fails,
+ * 	the method throws an exception of type std::runtime_error().  The process
+ * 	for initializing the LCD module involves shifting the device into 4-bit
+ * 	mode, specifying the character mode, and specifying other miscelaneous
+ * 	operating parameters.
+ *
+ * 	@image html lcd_flow.png
  *
  */
-
 namespace LCD {
 
+	///Weather or not the LCD backlight is on. true = on, false = off.
 	bool backlight = false;
+	///Register selector. true = character register, false = command register.
 	bool regSelect = false;
+	///Read/write register.  Currently unused.
 	bool readWrite = false;
 
+	/*!	LCD Initialization Method.
+	 *
+	 * 	This method initializes the bcm2835's I2C interface, then sends the
+	 * 	proper messages to configure the LCD device.
+	 */
 	void init() {
 		//Initialize the LCD
 		printf("[" WHITE "----" RESET "] Initializing LCD...");
@@ -64,6 +81,11 @@ namespace LCD {
 		printf("\r[" GREEN "OKAY\n" RESET);
 	}
 
+	/*!	LCD Destruction Method.
+	 *
+	 * 	This method terminates the bcm2835's I2C interface, contributing to a
+	 * 	more graceful shutdown sequence.
+	 */
 	void destroy() {
 		//Destroy the LCD
 		printf("[" WHITE "----" RESET "] Destroying LCD...");
@@ -74,7 +96,18 @@ namespace LCD {
 		printf("\r[" GREEN "OKAY\n" RESET);
 	}
 
-	//Writes a 4 bit message to the LCD
+	/*!	LCD write method.
+	 *
+	 * 	@warning This method should never be called directly, as doing so may
+	 * 	result in i2c message synchronization issues.
+	 *
+	 * 	This method converts a 4-bit nybble destined for the LCD into a properly
+	 * 	formatted 8-bit message which includes necessary bits for identifying
+	 * 	the target register and weather or not the backlight should be enabled.
+	 *
+	 * 	@param byte	Byte to write to the LCD.  Note that the 4 higher order bits
+	 * 		will be ignored.
+	 */
 	void write(char byte) {
 		//Shift the byte
 		byte = byte << 4;
@@ -97,7 +130,14 @@ namespace LCD {
 		usleep(1500);
 	}
 
-	//Writes a character to the LCD
+	/*!	Character write method.
+	 *
+	 * 	This method takes the given character, encodes it so that it can be
+	 * 	understood by the LCD, specifies the proper register, and then sends it
+	 * 	to the LCD.
+	 *
+	 *	@param c	Character to display.
+	 */
 	void writeChar(char c) {
 		//Get the character code
 		char ccode = encodeChar(c);
@@ -111,7 +151,13 @@ namespace LCD {
 		write(m2);
 	}
 
-	//Writes a raw 8 bit message to the expander
+	/*!	Write a raw byte to the IO expander.
+	 *
+	 * 	This method writes an 8-bit message directly to the IO expander on the
+	 * 	back of the LCD module.
+	 *
+	 * 	@param byte	The byte to write to the IO expander.
+	 */
 	int writeRaw(char byte) {
 		//Convert to character array
 		char message[] { byte };
@@ -119,7 +165,14 @@ namespace LCD {
 		return bcm2835_i2c_write(message, 1);
 	}
 
-	void writeMessage(char* message, int offset) {
+	/*! Write a message to the display.
+	 *
+	 * 	This method writes the null-terminated string @p message to the
+	 * 	display.
+	 *
+	 * 	@param message	Null-terminated string to display
+	 */
+	void writeMessage(char* message) {
 		//Encode the message
 		int i = 0;
 		while(true) {
@@ -132,6 +185,11 @@ namespace LCD {
 		}
 	}
 
+	/*!	Clear the display.
+	 *
+	 *	This method does not clear the display. It doesn't. Nope. Not at all.
+	 *	I don't know where you got that idea.
+	 */
 	void clear() {
 		//Set mode to command
 		regSelect = false;
@@ -140,6 +198,10 @@ namespace LCD {
 		write(0b0001);
 	}
 
+	/*!	Return cursor to home.
+	 *
+	 * 	This method moves the cursor position back to zero.
+	 */
 	void home() {
 		//Set mode to command
 		regSelect = false;
@@ -148,6 +210,26 @@ namespace LCD {
 		write(0b0010);
 	}
 
+	/*!	Go to the specified position.
+	 *
+	 * 	This method instructs the LCD module to change the cursor position to
+	 * 	the value of @p pos.
+	 *
+	 * 	@param pos	The position to move the LCD cursor to.
+	 */
+	void goTo(int pos) {
+
+	}
+
+	/*!	Character encoder.
+	 *
+	 * 	This method takes the input character c, and returns the corresponding
+	 * 	LCD character code, if found.
+	 *
+	 * 	@param c	Input character
+	 * 	@return		LCD character code, or "?" if the character was not
+	 * 		recognized.
+	 */
 	char encodeChar(char c) {
 		switch(c) {
 			case ' ': return 0b00100000;
