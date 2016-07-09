@@ -3,6 +3,7 @@
 #include "GPIO.h"
 #include "Keypad.h"
 #include "RFID.h"
+#include "HttpSend.h"
 #include "ANSI.h"
 
 #include <stdio.h>
