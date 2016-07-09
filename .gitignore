@@ -6,6 +6,7 @@ attendance-pi/.project
 attendance-pi/.settings/
 attendance-pi/bin/
 attendance-pi/obj/
+attendance-pi/doc
 
 # Visual Studio
 .vs
