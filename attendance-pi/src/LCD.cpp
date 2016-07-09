@@ -119,22 +119,6 @@ namespace LCD {
 		return bcm2835_i2c_write(message, 1);
 	}
 
-	/*int writeRaw2(bool a, bool b, bool c, bool d, bool e, bool f, bool g, bool h) {
-		//Create the character
-		char byte;
-		//Add the bits to it
-		if(a) { byte += 0b10000000; }
-		if(b) { byte += 0b01000000; }
-		if(c) { byte += 0b00100000; }
-		if(d) { byte += 0b00010000; }
-		if(e) { byte += 0b00001000; }	//Backlight
-		if(f) { byte += 0b00000100; }	//Enable
-		if(g) { byte += 0b00000010; }	//Read / Write
-		if(h) { byte += 0b00000001; }	//Register Select
-		//Write the raw character
-		return writeRaw(byte);
-	}*/
-
 	void writeMessage(char* message, int offset) {
 		//Encode the message
 		int i = 0;
