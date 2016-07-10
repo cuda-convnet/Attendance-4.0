@@ -2,6 +2,8 @@
 #include "LCD.h"
 #include "Keypad.h"
 #include "RFID.h"
+#include "Clock.h"
+
 #include "HttpSend.h"
 #include "ANSI.h"
 
@@ -19,14 +21,18 @@ int main() {
 		LCD::init();
 		Keypad::init();
 		RFID::init();
+		Clock::init();
 	} catch(const std::runtime_error& e) {
 		//Catch the error
 		printf("[" RED "ERR " RESET "] %s\n" RESET, e.what());
 	}
 
+	usleep(600000000);
+
 
 	//Clean up time
 	printf("[" CYAN "INFO" RESET "] Destroying components...\n");
+	Clock::destroy();
 	RFID::destroy();
 	Keypad::destroy();
 	LCD::destroy();
