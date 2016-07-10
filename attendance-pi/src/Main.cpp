@@ -8,8 +8,11 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <bcm2835.h>
+#include <unistd.h>
 
 int main() {
+	//Initialize components
+	printf("[" CYAN "INFO" RESET "] Initializing components...\n");
 	try {
 		//Initialize things
 		Main::init();
@@ -20,6 +23,14 @@ int main() {
 		//Catch the error
 		printf("[" RED "ERR " RESET "] %s\n" RESET, e.what());
 	}
+
+
+	//Clean up time
+	printf("[" CYAN "INFO" RESET "] Destroying components...\n");
+	RFID::destroy();
+	Keypad::destroy();
+	LCD::destroy();
+	Main::destroy();
 }
 
 namespace Main {
@@ -46,8 +57,9 @@ namespace Main {
 		//Un-initialize the bcm2835 library
 		if(!bcm2835_close()) {
 			//Failed to de-initialize library
-			printf("\r[" RED "FAIL\n" RESET);
-			throw std::runtime_error("Failed to destroy bcm2835 library");
+			printf("\r[" YELLOW "WARN\n" RESET);
+			printf("  Failed to destroy bcm2835 library");
+			return;
 		}
 
 		//Success

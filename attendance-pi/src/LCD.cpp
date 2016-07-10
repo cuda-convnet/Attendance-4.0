@@ -118,7 +118,7 @@ namespace LCD {
 		backlight = true;
 
 		//Test message
-		writeMessage("TESTING TESTING");
+		writeMessage("    Loading...");
 
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);

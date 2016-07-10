@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <bcm2835.h>
+#include <thread>
+#include <unistd.h>
 
 /*!	@section mod_init	Module Initialization
  *
@@ -26,7 +28,22 @@
  */
 namespace Keypad {
 
-	//Key mapping
+	///Thread termination condition
+	bool run = true;
+
+	/*!	Key release state.
+	 *
+	 * 	The key release state is set to HIGH when a keypress is detected, and
+	 * 	is not returned to LOW until the key is registered as being up.  This
+	 * 	prevents the keypress from being registered repeatedly for a single
+	 * 	actual press.
+	 */
+	int keystate[] { LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW };
+
+	///Polling thread
+	std::thread pollThread;
+
+	///Key map.
 	int keymap[] {
 			RPI_GPIO_P1_15,	//1
 			RPI_GPIO_P1_15,	//2
@@ -38,8 +55,8 @@ namespace Keypad {
 			RPI_GPIO_P1_15,	//8
 			RPI_GPIO_P1_15,	//9
 			RPI_GPIO_P1_15,	//0
-			RPI_GPIO_P1_15,	//Enter
-			RPI_GPIO_P1_15	//Clear
+			RPI_GPIO_P1_15,	//Enter #
+			RPI_GPIO_P1_15	//Clear *
 	};
 
 	/*!	Keypad Initialization Method.
@@ -48,15 +65,13 @@ namespace Keypad {
 	 * 	associated with each individual key, and then spawning the pin polling
 	 * 	thread.
 	 *
-	 * 	@todo Write the GPIO monitor thread
-	 *
 	 */
 	void init() {
 		//Initialize the keypad
 		printf("[" WHITE "----" RESET "] Initializing Keypad...");
 
 		//Configure each key
-		for(unsigned int i = 0; i < sizeof(keymap) / sizeof(int); i++) {
+		for(int i = 0; i < 12; i++) {
 			//Set to input
 			bcm2835_gpio_fsel(keymap[i], BCM2835_GPIO_FSEL_INPT);
 			//Set to pull-down
@@ -64,7 +79,7 @@ namespace Keypad {
 		}
 
 		//Start the GPIO monitor thread
-
+		pollThread = std::thread(keyThread);
 
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
@@ -72,18 +87,94 @@ namespace Keypad {
 
 	/*!	Keypad Destruction Method.
 	 *
-	 * 	This method doesn't actually do anything at the moment, but is included
-	 * 	for consistency and in case of a future update.
-	 *
-	 * 	@todo Destroy the GPIO monitor thread
+	 * 	This method instructs the GPIO polling thread to terminate and then
+	 * 	rejoins it with the main thread to facilitate a clean shutdown.
 	 *
 	 */
 	void destroy() {
 		//Destroy the keypad
 		printf("[" WHITE "----" RESET "] Destroy Keypad...");
 
+		//Instruct the thread to terminate
+		run = false;
+		//Join the thread
+		pollThread.join();
+
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
+	}
+
+	/*!	Keypad polling thread main method.
+	 *
+	 * 	@warning This method should never be called directly, as it blocks
+	 * 	indefinitely.
+	 *
+	 * 	This method is spawned as a new thread by the keypad initialization
+	 * 	process, and handles the dirty work of listening for when a user has
+	 * 	pressed one of the keys by continuously polling the GPIO pins.
+	 *
+	 */
+	void keyThread() {
+		//Loop
+		while(run) {
+			//Iterate over each input
+			for(int i = 0; i < 12; i++) {
+				//Get the pin state
+				if(bcm2835_gpio_lev(keymap[i]) == HIGH) {
+					//Check the key state
+					if(keystate[i] == HIGH) { continue; } //Already registered
+					//Invoke the handler
+					handle(codeToChar(i));
+				} else {
+					//Set state to low
+					keystate[i] = LOW;
+				}
+			}
+			//Give the processor a bit of time
+			usleep(2000);
+		}
+	}
+
+	/*!	Keypad event handle method.
+	 *
+	 * 	This method is called by the keypad polling thread whenever it detects
+	 * 	that a key has been pressed, and passes the the respective key as an
+	 * 	argument.
+	 *
+	 * 	@todo Implement handling
+	 *
+	 * 	@param key	The key that was pressed
+	 */
+	void handle(char key) {
+
+	}
+
+	/*!	Key index to character converter.
+	 *
+	 * 	This method takes the index of a key as specified in @p keymap[] and
+	 * 	returns the respective character for it, or @p \\0 if somebody screwed
+	 * 	up the code.
+	 *
+	 * 	@param key	The index of the key
+	 * 	@returns	The character representation of that key.
+	 */
+	char codeToChar(int key) {
+		//Find it
+		switch(key) {
+			case 0: return '1';
+			case 1: return '2';
+			case 2: return '3';
+			case 3: return '4';
+			case 4: return '5';
+			case 5: return '6';
+			case 6: return '7';
+			case 7: return '8';
+			case 8: return '9';
+			case 9: return '0';
+			case 10: return '#';
+			case 11: return '*';
+			default: return '\0';
+		}
 	}
 
 }
