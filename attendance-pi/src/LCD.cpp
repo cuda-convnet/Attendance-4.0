@@ -6,6 +6,10 @@
 #include <bcm2835.h>
 #include <unistd.h>
 
+#include <string>
+
+using std::string;
+
 #define I2C_SLAVE_ADDRESS	0x27
 
 #define BACKLIGHT_BIT	0b00001000
@@ -112,7 +116,7 @@ namespace LCD {
 		backlight = true;
 
 		//Test message
-		writeMessage("TESTING TESTING",0);
+		writeMessage("TESTING TESTING");
 
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
@@ -209,16 +213,11 @@ namespace LCD {
 	 *
 	 * 	@param message	Null-terminated string to display
 	 */
-	void writeMessage(char* message) {
+	void writeMessage(string message) {
 		//Encode the message
-		int i = 0;
-		while(true) {
-			//Check if end of message
-			if(message[i] == '\0') { return; }
+		for (unsigned int i = 0; i < message.size(); i++) {
 			//Write encoded character
 			writeChar(message[i]);
-			//Increment counter
-			i++;
 		}
 	}
 

@@ -1,19 +1,21 @@
 #pragma once
 
+#include <string>
+
 namespace LCD {
 
 	void init();
 	void destroy();
 
-	void writeMessage(char*);
-	void writeChar(char);
+	void writeMessage(std::string message);
+	void writeChar(char c);
 
-	void write(char);
-	int writeRaw(char);
+	void write(char byte);
+	int writeRaw(char byte);
 
 	void clear();
 	void home();
-	void goTo(int);
+	void goTo(int pos);
 
-	char encodeChar(char);
+	char encodeChar(char c);
 }
