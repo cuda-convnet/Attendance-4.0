@@ -44,6 +44,7 @@ namespace Main {
 	void init() {
 		//Initialize the main things
 		printf("[" WHITE "----" RESET "] Initializing Main...");
+		fflush(stdout);
 
 		//Initialize the bcm2835 library
 		if(!bcm2835_init()) {
@@ -59,6 +60,7 @@ namespace Main {
 	void destroy() {
 		//Destroy the main things
 		printf("[" WHITE "----" RESET "] Destroying Main...");
+		fflush(stdout);
 
 		//Un-initialize the bcm2835 library
 		if(!bcm2835_close()) {

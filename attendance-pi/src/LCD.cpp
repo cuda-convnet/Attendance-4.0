@@ -85,6 +85,7 @@ namespace LCD {
 	void init() {
 		//Initialize the LCD
 		printf("[" WHITE "----" RESET "] Initializing LCD...");
+		fflush(stdout);
 
 		//Initialize the I2C connection
 		if(!bcm2835_i2c_begin()) {
@@ -122,6 +123,7 @@ namespace LCD {
 
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
+		fflush(stdout);
 	}
 
 	/*!	LCD Destruction Method.

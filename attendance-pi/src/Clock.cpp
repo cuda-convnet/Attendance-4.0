@@ -18,6 +18,7 @@ namespace Clock {
 	void init() {
 		//Initialize the clock
 		printf("[" WHITE "----" RESET "] Initializing Clock...");
+		fflush(stdout);
 
 		//Start clock thread
 		cThread = std::thread(clockThread);
@@ -29,6 +30,7 @@ namespace Clock {
 	void destroy() {
 		//Destroy the clock
 		printf("[" WHITE "----" RESET "] Destroy Clock...");
+		fflush(stdout);
 
 		//Instruct the thread to terminate
 		run = false;
@@ -37,6 +39,7 @@ namespace Clock {
 
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
+		fflush(stdout);
 	}
 
 	void clockThread() {
@@ -58,7 +61,7 @@ namespace Clock {
 		//Time object
 		std::time_t now = std::time(0);
 		struct std::tm tstruct;
-		char buf[16];
+		char buf[17];
 		//Calculate time
 		tstruct = *std::localtime(&now);
 		//Convert to string

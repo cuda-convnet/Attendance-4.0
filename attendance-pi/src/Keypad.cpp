@@ -69,6 +69,7 @@ namespace Keypad {
 	void init() {
 		//Initialize the keypad
 		printf("[" WHITE "----" RESET "] Initializing Keypad...");
+		fflush(stdout);
 
 		//Configure each key
 		for(int i = 0; i < 12; i++) {
@@ -94,6 +95,7 @@ namespace Keypad {
 	void destroy() {
 		//Destroy the keypad
 		printf("[" WHITE "----" RESET "] Destroy Keypad...");
+		fflush(stdout);
 
 		//Instruct the thread to terminate
 		run = false;

@@ -15,6 +15,7 @@ namespace RFID {
 
 	void init() {
 		printf("[" WHITE "----" RESET "] Initializing RFID...");
+		fflush(stdout);
 
 		// initialize MFRC522 library
 		mfrc = new MFRC522();
@@ -25,6 +26,7 @@ namespace RFID {
 
 	void destroy() {
 		printf("[" WHITE "----" RESET "] Destroy RFID...");
+		fflush(stdout);
 
 		// clean up MFRC522 library and SPI
 		delete mfrc;
