@@ -1,6 +1,5 @@
 #include "Main.h"
 #include "LCD.h"
-#include "GPIO.h"
 #include "Keypad.h"
 #include "RFID.h"
 #include "HttpSend.h"
@@ -15,7 +14,6 @@ int main() {
 		//Initialize things
 		Main::init();
 		LCD::init();
-		GPIO::init();
 		Keypad::init();
 		RFID::init();
 	} catch(const std::runtime_error& e) {
