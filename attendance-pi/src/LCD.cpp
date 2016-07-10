@@ -65,6 +65,8 @@ using std::string;
  *	LCD module can be found on its datasheet, which can be found
  *	<a href="https://www.sparkfun.com/datasheets/LCD/GDM1602K-Extended.pdf">
  *	here</a>
+ *
+ *	@todo Implement thread safe checking
  */
 namespace LCD {
 
