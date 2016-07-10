@@ -77,6 +77,9 @@ namespace LCD {
 	///Read/write register.  Currently unused.
 	bool readWrite = false;
 
+	///Busy flag
+	bool busy = false;
+
 	/*!	LCD Initialization Method.
 	 *
 	 * 	This method initializes the bcm2835's I2C interface, then sends the
@@ -181,6 +184,10 @@ namespace LCD {
 	 * 	understood by the LCD, specifies the proper register, and then sends it
 	 * 	to the LCD.
 	 *
+	 * 	@warning This method should never be called directly, as doing so may
+	 * 	result in i2c message synchronization issues.  Instead, use
+	 * 	@p writeMessage().
+	 *
 	 *	@param c	Character to display.
 	 */
 	void writeChar(char c) {
@@ -218,11 +225,17 @@ namespace LCD {
 	 * 	@param message	Null-terminated string to display
 	 */
 	void writeMessage(string message) {
+		//Wait for ready
+		wait();
+
 		//Encode the message
 		for (unsigned int i = 0; i < message.size(); i++) {
 			//Write encoded character
 			writeChar(message[i]);
 		}
+
+		//Clear busy flag
+		busy = false;
 	}
 
 	/*!	Clear the display.
@@ -243,11 +256,17 @@ namespace LCD {
 	 * 	This method moves the cursor position back to zero.
 	 */
 	void home() {
+		//Wait for ready
+		wait();
+
 		//Set mode to command
 		regSelect = false;
 		//Send the command
 		write(0b0000);
 		write(0b0010);
+
+		//Clear busy flag
+		busy = false;
 	}
 
 	/*!	Go to the specified position.
@@ -258,7 +277,24 @@ namespace LCD {
 	 * 	@param pos	The position to move the LCD cursor to.
 	 */
 	void goTo(int pos) {
+		//Wait for ready
+		wait();
+		//Clear busy flag
+		busy = false;
+	}
 
+	/*!	Wait for ready.
+	 *
+	 * 	Waits until the busy flag has been cleared before proceeding with the
+	 * 	requested operation.  This method also sets the busy flag to true as
+	 * 	quickly as possible to further reduce the risk of unintentionally
+	 * 	concurrent operations.
+	 */
+	void wait() {
+		//Violently waste CPU while waiting for the flag to clear
+		while(busy) { usleep(100); }
+		//Set the flag
+		busy = true;
 	}
 
 	/*!	Character encoder.

@@ -17,5 +17,7 @@ namespace LCD {
 	void home();
 	void goTo(int pos);
 
+	void wait();
+
 	char encodeChar(char c);
 }
