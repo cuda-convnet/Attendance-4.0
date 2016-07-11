@@ -18,19 +18,19 @@ namespace Clock {
 
 	void init() {
 		//Initialize the clock
-		printf("[" WHITE "----" RESET "] Initializing Clock...");
+		printf(LOADING "Initializing Clock...");
 		fflush(stdout);
 
 		//Start clock thread
 		cThread = std::thread(clockThread);
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
+		printf(OKAY "\n");
 	}
 
 	void destroy() {
 		//Destroy the clock
-		printf("[" WHITE "----" RESET "] Destroy Clock...");
+		printf(LOADING "Destroy Clock...");
 		fflush(stdout);
 
 		//Instruct the thread to terminate
@@ -39,8 +39,7 @@ namespace Clock {
 		cThread.join();
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
-		fflush(stdout);
+		printf(OKAY "\n");
 	}
 
 	void clockThread() {

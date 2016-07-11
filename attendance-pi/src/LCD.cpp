@@ -8,8 +8,6 @@
 
 #include <string>
 
-using std::string;
-
 #define I2C_SLAVE_ADDRESS	0x27
 
 #define BACKLIGHT_BIT	0b00001000
@@ -87,7 +85,7 @@ namespace LCD {
 	 */
 	void init() {
 		//Initialize the LCD
-		printf("[" WHITE "----" RESET "] Initializing LCD...");
+		printf(LOADING "Initializing LCD...");
 		fflush(stdout);
 
 		//Initialize the I2C connection
@@ -127,8 +125,7 @@ namespace LCD {
 		writeMessage("   Loading...");
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
-		fflush(stdout);
+		printf(OKAY "\n");
 	}
 
 	/*!	LCD Destruction Method.
@@ -311,7 +308,7 @@ namespace LCD {
 	 *
 	 * 	@param message	Null-terminated string to display
 	 */
-	void writeMessage(string message) {
+	void writeMessage(std::string message) {
 		//Wait for ready
 		wait();
 

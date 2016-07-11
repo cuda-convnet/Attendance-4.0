@@ -14,7 +14,7 @@
 
 int main() {
 	//Initialize components
-	printf("[" CYAN "INFO" RESET "] Initializing components...\n");
+	printf(INFO "Initializing components...\n");
 	try {
 		//Initialize things
 		Main::init();
@@ -31,7 +31,7 @@ int main() {
 
 
 	//Clean up time
-	printf("[" CYAN "INFO" RESET "] Destroying components...\n");
+	printf(INFO "Destroying components...\n");
 	Clock::destroy();
 	RFID::destroy();
 	Keypad::destroy();
@@ -43,7 +43,7 @@ namespace Main {
 
 	void init() {
 		//Initialize the main things
-		printf("[" WHITE "----" RESET "] Initializing Main...");
+		printf(LOADING "Initializing Main...");
 		fflush(stdout);
 
 		//Initialize the bcm2835 library
@@ -54,12 +54,12 @@ namespace Main {
 		}
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
+		printf(OKAY "\n");
 	}
 
 	void destroy() {
 		//Destroy the main things
-		printf("[" WHITE "----" RESET "] Destroying Main...");
+		printf(LOADING "Destroying Main...");
 		fflush(stdout);
 
 		//Un-initialize the bcm2835 library
@@ -71,7 +71,7 @@ namespace Main {
 		}
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
+		printf(OKAY "\n");
 	}
 }
 

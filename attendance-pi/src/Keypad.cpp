@@ -45,18 +45,18 @@ namespace Keypad {
 
 	///Key map.
 	int keymap[] {
-			RPI_GPIO_P1_15,	//1
-			RPI_GPIO_P1_15,	//2
-			RPI_GPIO_P1_15,	//3
-			RPI_GPIO_P1_15,	//4
-			RPI_GPIO_P1_15,	//5
-			RPI_GPIO_P1_15,	//6
-			RPI_GPIO_P1_15,	//7
-			RPI_GPIO_P1_15,	//8
-			RPI_GPIO_P1_15,	//9
-			RPI_GPIO_P1_15,	//0
-			RPI_GPIO_P1_15,	//Enter #
-			RPI_GPIO_P1_15	//Clear *
+			RPI_V2_GPIO_P1_13,	//1
+			RPI_V2_GPIO_P1_40,	//2
+			RPI_V2_GPIO_P1_33,	//3
+			RPI_V2_GPIO_P1_12,	//4
+			RPI_V2_GPIO_P1_18,	//5
+			RPI_V2_GPIO_P1_32,	//6
+			RPI_V2_GPIO_P1_11,	//7
+			RPI_V2_GPIO_P1_16,	//8
+			RPI_V2_GPIO_P1_31,	//9
+			RPI_V2_GPIO_P1_15,	//0
+			RPI_V2_GPIO_P1_29,	//Enter #
+			RPI_V2_GPIO_P1_07	//Clear *
 	};
 
 	/*!	Keypad Initialization Method.
@@ -68,7 +68,7 @@ namespace Keypad {
 	 */
 	void init() {
 		//Initialize the keypad
-		printf("[" WHITE "----" RESET "] Initializing Keypad...");
+		printf(LOADING "Initializing Keypad...");
 		fflush(stdout);
 
 		//Configure each key
@@ -83,7 +83,7 @@ namespace Keypad {
 		pollThread = std::thread(keyThread);
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
+		printf(OKAY "\n");
 	}
 
 	/*!	Keypad Destruction Method.
@@ -127,6 +127,8 @@ namespace Keypad {
 					if(keystate[i] == HIGH) { continue; } //Already registered
 					//Invoke the handler
 					handle(codeToChar(i));
+					//Set key state
+					keystate[i] = HIGH;
 				} else {
 					//Set state to low
 					keystate[i] = LOW;
@@ -148,7 +150,7 @@ namespace Keypad {
 	 * 	@param key	The key that was pressed
 	 */
 	void handle(char key) {
-
+		printf(INFO "Key pressed: %c\n", key);
 	}
 
 	/*!	Key index to character converter.
