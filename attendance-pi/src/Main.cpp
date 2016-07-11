@@ -4,6 +4,7 @@
 #include "RFID.h"
 #include "Clock.h"
 
+#include "State.h"
 #include "HttpSend.h"
 #include "ANSI.h"
 
@@ -13,6 +14,8 @@
 #include <unistd.h>
 
 int main() {
+	//Change state
+	State::changeState(State::INIT);
 	//Initialize components
 	printf(INFO "Initializing components...\n");
 	try {
@@ -24,19 +27,28 @@ int main() {
 		Clock::init();
 	} catch(const std::runtime_error& e) {
 		//Catch the error
+		State::changeState(State::ERROR);
 		printf("[" RED "ERR " RESET "] %s\n" RESET, e.what());
 	}
+
+	//Read
+	State::changeState(State::READY);
+	printf(INFO "Ready!\n");
 
 	usleep(600000000);
 
 
 	//Clean up time
+	State::changeState(State::STOPPING);
 	printf(INFO "Destroying components...\n");
 	Clock::destroy();
 	RFID::destroy();
 	Keypad::destroy();
 	LCD::destroy();
 	Main::destroy();
+
+	//Change state for the last time
+	State::changeState(State::STOPPED);
 }
 
 namespace Main {

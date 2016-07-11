@@ -35,3 +35,4 @@
 #define OKAY	"\r" RESET "[" GREEN "OKAY" RESET "] "
 #define LOADING "\r" RESET "[" WHITE "----" RESET "] "
 #define FAIL	"\r" RESET "[" RED   "FAIL" RESET "] "
+#define WARN	"\r" RESET "[" YELLOW "WARN" RESET "] "

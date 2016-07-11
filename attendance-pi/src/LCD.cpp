@@ -353,8 +353,7 @@ namespace LCD {
 		//Set mode to command
 		regSelect = false;
 		//Send the command
-		write(0b0000);
-		write(0b0010);
+		writeByte(0b00000010);
 
 		//Clear busy flag
 		busy = false;
@@ -376,7 +375,7 @@ namespace LCD {
 		//Calculate raw offset
 		int offset = (row * 64) + col;
 		//Create the command byte
-		char cmd = (offset & 0b00111111) | 0b01000000;
+		char cmd = (offset & 0b01111111) | 0b10000000;
 		//Send the command
 		writeByte(cmd);
 

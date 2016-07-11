@@ -1,5 +1,8 @@
 #include "Keypad.h"
 #include "ANSI.h"
+#include "Main.h"
+#include "State.h"
+#include "LCD.h"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -59,6 +62,11 @@ namespace Keypad {
 			RPI_V2_GPIO_P1_07	//Clear *
 	};
 
+	///Input buffer
+	char input[] = "----";
+	///Position to write the next digit to in the input buffer
+	int ipos = 0;
+
 	/*!	Keypad Initialization Method.
 	 *
 	 * 	This method initializes the keypad by first configuring the GPIO pin
@@ -94,7 +102,7 @@ namespace Keypad {
 	 */
 	void destroy() {
 		//Destroy the keypad
-		printf("[" WHITE "----" RESET "] Destroy Keypad...");
+		printf(LOADING "Destroy Keypad...");
 		fflush(stdout);
 
 		//Instruct the thread to terminate
@@ -103,7 +111,7 @@ namespace Keypad {
 		pollThread.join();
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
+		printf(OKAY "\n");
 	}
 
 	/*!	Keypad polling thread main method.
@@ -145,12 +153,59 @@ namespace Keypad {
 	 * 	that a key has been pressed, and passes the the respective key as an
 	 * 	argument.
 	 *
-	 * 	@todo Implement handling
+	 * 	@todo Create a nifty diagram
+	 *
+	 * 	@todo Create a better display clear system
 	 *
 	 * 	@param key	The key that was pressed
 	 */
 	void handle(char key) {
-		printf(INFO "Key pressed: %c\n", key);
+		//Check the state
+		if(State::state == State::READY) {
+			//Change the state
+			State::changeState(State::INPUT);
+			//Clear the first line of the display
+			LCD::home();
+			LCD::writeMessage("                ");
+		} else if(State::state != State::INPUT) {
+			//Not allowed
+			printf(WARN "Input received during illegal state\n");
+			return;
+		}
+
+		if(key == '*') {	//Check if this is the reset command
+			//Clear the display
+			input[0] = '-';
+			input[1] = '-';
+			input[2] = '-';
+			input[3] = '-';
+			ipos = 0;
+			printf(INFO "Cleared the display\n");
+			return;
+		} else if(key == '#') {	//Check if this is the submit command
+			//Submit
+			printf(INFO "Process login event for user with ID %s\n", input);
+			input[0] = '-';
+			input[1] = '-';
+			input[2] = '-';
+			input[3] = '-';
+			ipos = 0;
+			State::changeState(State::READY);
+			return;
+		} else if(ipos > 3) {	//Check if this is the
+			//Not allowed
+			printf(WARN "Too many characters\n");
+		} else {
+			//Set the character
+			input[ipos] = key;
+			//Increment the input position counter
+			ipos++;
+		}
+
+		//Update the display
+		LCD::goTo(0,6);
+		LCD::writeMessage(input);
+
 	}
 
 	/*!	Key index to character converter.
