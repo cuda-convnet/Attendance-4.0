@@ -71,7 +71,7 @@ using std::string;
 namespace LCD {
 
 	///Weather or not the LCD backlight is on. true = on, false = off.
-	bool backlight = false;
+	bool backlight = true;
 	///Register selector. true = character register, false = command register.
 	bool regSelect = false;
 	///Read/write register.  Currently unused.
@@ -102,27 +102,29 @@ namespace LCD {
 
 		//Set display to command mode
 		regSelect = false;
+
 		//Send the initialization data
-		write(0b0010);	usleep(5000);	//Set mode to 4-bit
-		write(0b1000);	usleep(5000);	//Set to 2 line, 5x8 character mode
+		writeByte(0b00100100);	//Set mode to 4-bit 2 line 5x8 character
+		usleep(2000);
+		writeByte(0b00100100);	//Do it again because sometimes it doesn't work
+		usleep(2000);
+		writeByte(0b00101000);	//One last time
+		usleep(2000);
 
-		write(0b0000);
-		write(0b1000);	usleep(5000);	//Set display off, cursor off, and blink off
+		writeByte(0b00001100);	//Set display on, cursor off, blink off
+		usleep(2000);
 
-		write(0b0000);
-		write(0b0001);	usleep(5000);	//Clear display and move cursor home
+		writeByte(0b00000001);	//Clear the display
+		usleep(2000);
 
-		write(0b0000);
-		write(0b0110);	usleep(5000);	//Set cursor to increment right, don't shift screen
+		writeByte(0b00000110);	//Set cursor to increment right without shifting
+		usleep(2000);
 
-		write(0b0000);
-		write(0b1100);	usleep(5000);	//Turn the display back on
+		writeByte(0b00000001);	//Clear the display
+		usleep(2000);
 
-		//Turn the backlight on
-		backlight = true;
-
-		//Test message
-		writeMessage("    Loading...");
+		//Something must be wrong here but I have no idea
+		writeMessage("   Loading...");
 
 		//Success
 		printf("\r[" GREEN "OKAY\n" RESET);
@@ -167,15 +169,15 @@ namespace LCD {
 
 		//Write low
 		writeRaw(byte);
-		usleep(1500);
+		usleep(100);
 
 		//Write high
 		writeRaw(byte | ENABLE_BIT);
-		usleep(1500);
+		usleep(100);
 
 		//Write low
 		writeRaw(byte);
-		usleep(1500);
+		usleep(100);
 	}
 
 	/*!	Character write method.
@@ -190,17 +192,102 @@ namespace LCD {
 	 *
 	 *	@param c	Character to display.
 	 */
-	void writeChar(char c) {
-		//Get the character code
-		char ccode = encodeChar(c);
+	void writeByte(char byte) {
 		//Split the character into two messages
-		char m1 = (ccode & 0b11110000) >> 4;
-		char m2 = (ccode & 0b00001111);
-		//Set mode to character
-		regSelect = true;
+		char m1 = (byte & 0b11110000) >> 4;
+		char m2 = (byte & 0b00001111);
 		//Write the two messages
 		write(m1);
 		write(m2);
+
+		/*	This is old debugging code for communications to the LCD.  I was
+		 *	having troubles caused by an improperly set bit, and I ended up
+		 *	writing this thing in the process, but once the issue was
+		 *	resolved I didn't have the heart to delete it.
+
+		std::string ba;
+		if(regSelect) {
+			ba += "Character command to draw '";
+			ba += byte;
+			ba += "'";
+		} else {
+			ba += "Display command to ";
+			if(byte == 0b00000001) {
+				ba += "clear display";
+			} else if(byte == 0b00000010) {
+				ba += "return home";
+			} else if(byte == 0b00000011) {
+				ba += "return home (extra bit)";
+			} else if(byte & 0b10000000) {
+				ba += "set DDRAM address to " + (int) (byte & 0b01111111);
+			} else if(byte & 0b01000000) {
+				ba += "set CGRAM address to " + (int) (byte & 0b00111111);
+			} else if(byte & 0b00100000) {
+				ba += "set display function: ";
+				if(byte & 0b00010000) {
+					ba += "Data: 8-bit  ";
+				} else {
+					ba += "Data: 4-bit  ";
+				}
+				if(byte & 0b00001000) {
+					ba += "Lines: 2-line  ";
+				} else {
+					ba += "Lines: 1-line  ";
+				}
+				if(byte & 0b00000100) {
+					ba += "Format: 5x11 dots";
+				} else {
+					ba += "Format: 5x8 dots";
+				}
+			} else if(byte & 0b00010000) {
+				ba += "shift cursor/display: ";
+				if(byte & 0b00001100) {
+					ba += "Shift entire display to right, cursor moves along";
+				} else if(byte & 0b00001000) {
+					ba += "Shift entire display to left, cursor moves along";
+				} else if(byte & 0b00000100) {
+					ba += "Shift cursor to the right, AC increased by 1";
+				} else {
+					ba += "Shift cursor to the left, AC decreased by 1";
+				}
+			} else if(byte & 0b00001000) {
+				ba += "set display on/off control: ";
+				if(byte & 0b00000100) {
+					ba += "Display: ON  ";
+				} else {
+					ba += "Display: OFF  ";
+				}
+				if(byte & 0b00000010) {
+					ba += "Cursor: ON  ";
+				} else {
+					ba += "Cursor: OFF  ";
+				}
+				if(byte & 0b00000001) {
+					ba += "Blink: ON";
+				} else {
+					ba += "Blink: OFF";
+				}
+			} else if(byte & 0b00000100) {
+				ba += "set entry mode: ";
+				if(byte & 0b00000010) {
+					ba += "DDRAM: Increment  ";
+				} else {
+					ba += "DDRAM: Decrement  ";
+				}
+				if(byte & 0b00000001) {
+					ba += "Shift: ON";
+				} else {
+					ba += "Shift: OFF";
+				}
+			} else {
+				ba += "-UNKNOWN COMMAND-";
+			}
+		}
+
+		//DEBUG
+		printf("%s\n", ba.c_str());
+
+		*/
 	}
 
 	/*!	Write a raw byte to the IO expander.
@@ -228,10 +315,12 @@ namespace LCD {
 		//Wait for ready
 		wait();
 
+		//Set mode to char
+		regSelect = true;
 		//Encode the message
 		for (unsigned int i = 0; i < message.size(); i++) {
 			//Write encoded character
-			writeChar(message[i]);
+			writeByte(encodeChar(message[i]));
 		}
 
 		//Clear busy flag
@@ -244,11 +333,16 @@ namespace LCD {
 	 *	I don't know where you got that idea.
 	 */
 	void clear() {
+		//Wait for ready
+		wait();
+
 		//Set mode to command
 		regSelect = false;
 		//Send the command
-		write(0b0000);
-		write(0b0001);
+		writeByte(0b00000001);
+
+		//Clear the busy flag
+		busy = false;
 	}
 
 	/*!	Return cursor to home.
@@ -276,9 +370,19 @@ namespace LCD {
 	 *
 	 * 	@param pos	The position to move the LCD cursor to.
 	 */
-	void goTo(int pos) {
+	void goTo(int row, int col) {
 		//Wait for ready
 		wait();
+
+		//Set mode to command
+		regSelect = false;
+		//Calculate raw offset
+		int offset = (row * 64) + col;
+		//Create the command byte
+		char cmd = (offset & 0b00111111) | 0b01000000;
+		//Send the command
+		writeByte(cmd);
+
 		//Clear busy flag
 		busy = false;
 	}

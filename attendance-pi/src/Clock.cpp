@@ -1,4 +1,5 @@
 #include "Clock.h"
+#include "LCD.h"
 #include "ANSI.h"
 
 #include <stdio.h>
@@ -50,10 +51,12 @@ namespace Clock {
 		while(run) {
 			//Get formatted date
 			date = getDate();
-			//Debug
-			printf("[" CYAN "INFO" RESET "] Current date is %s\n", date.c_str());
+			//Go to first space on second line
+			LCD::goTo(1,0);
+			//Write the message
+			LCD::writeMessage(date);
 			//Delay
-			sleep(1);
+			sleep(10);
 		}
 	}
 

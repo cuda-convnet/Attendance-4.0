@@ -8,16 +8,16 @@ namespace LCD {
 	void destroy();
 
 	void writeMessage(std::string message);
-	void writeChar(char c);
 
-	void write(char byte);
-	int writeRaw(char byte);
+	void writeByte(char);
+	void write(char);
+	int writeRaw(char);
 
 	void clear();
 	void home();
-	void goTo(int pos);
+	void goTo(int, int);
 
 	void wait();
 
-	char encodeChar(char c);
+	char encodeChar(char);
 }
