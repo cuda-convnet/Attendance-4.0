@@ -29,3 +29,9 @@
 #define UNDERLINE	"\33[3m"
 #define INVERSE	"\33[7m"
 #define STRIKE	"\33[9m"
+
+//Logging message headers
+#define INFO	"\r" RESET "[" CYAN  "INFO" RESET "] "
+#define OKAY	"\r" RESET "[" GREEN "OKAY" RESET "] "
+#define LOADING "\r" RESET "[" WHITE "----" RESET "] "
+#define FAIL	"\r" RESET "[" RED   "FAIL" RESET "] "
