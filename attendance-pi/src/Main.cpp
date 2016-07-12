@@ -1,5 +1,6 @@
 #include "Main.h"
 #include "LCD.h"
+#include "Buzzer.h"
 #include "Keypad.h"
 #include "RFID.h"
 #include "Clock.h"
@@ -22,6 +23,7 @@ int main() {
 		//Initialize things
 		Main::init();
 		LCD::init();
+		Buzzer::init();
 		Keypad::init();
 		RFID::init();
 		Clock::init();
@@ -44,6 +46,7 @@ int main() {
 	Clock::destroy();
 	RFID::destroy();
 	Keypad::destroy();
+	Buzzer::destroy();
 	LCD::destroy();
 	Main::destroy();
 

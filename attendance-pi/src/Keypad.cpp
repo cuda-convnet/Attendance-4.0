@@ -3,6 +3,7 @@
 #include "Main.h"
 #include "State.h"
 #include "LCD.h"
+#include "Buzzer.h"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -182,27 +183,40 @@ namespace Keypad {
 		if(key == '*') {	//Check if this is the reset command
 			//Clear the display
 			reset();
+			//Beep
+			Buzzer::buzz(25000);
 			printf(INFO "Cleared the display\n");
 		} else if(key == '#') {	//Check if this is the submit command
 			//Check he number of digits
 			if(ipos < 4) {
 				//Not enough digits
 				printf(WARN "Not enough digits\n");
+				//Beep
+				Buzzer::buzz(25000);
 			} else {
 				//Submit
 				printf(INFO "Process login event for user with ID %s\n", input);
+				//Beep
+				Buzzer::buzz(25000);
 				//Clear the display
 				reset();
 				//Change the state back to ready
 				//TODO: Add user event handling
 				State::changeState(State::READY);
+				//Return
+				return;
 			}
-			//Skip updating the display
-			return;
 		} else if(ipos > 3) {	//Check the number of digits
 			//Not allowed - too many digits
 			printf(WARN "Too many digits\n");
+			//Beep
+			Buzzer::buzz(25000);
+			usleep(25000);
+			Buzzer::buzz(25000);
+			usleep(25000);
 		} else {
+			//Beep
+			Buzzer::buzz(25000);
 			//Set the character
 			input[ipos] = key;
 			//Increment the input position counter
