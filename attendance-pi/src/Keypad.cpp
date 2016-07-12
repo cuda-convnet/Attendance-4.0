@@ -31,6 +31,11 @@
  */
 namespace Keypad {
 
+	//Private declarations
+	void handle(char);
+	void keyThread();
+	char codeToChar(int);
+
 	///Thread termination condition
 	bool run = true;
 
@@ -157,6 +162,8 @@ namespace Keypad {
 	 *
 	 * 	@todo Create a better display clear system
 	 *
+	 * 	@todo Implement user input handling
+	 *
 	 * 	@param key	The key that was pressed
 	 */
 	void handle(char key) {
@@ -165,8 +172,7 @@ namespace Keypad {
 			//Change the state
 			State::changeState(State::INPUT);
 			//Clear the first line of the display
-			LCD::home();
-			LCD::writeMessage("                ");
+			LCD::writeMessage("                ",0,0);
 		} else if(State::state != State::INPUT) {
 			//Not allowed
 			printf(WARN "Input received during illegal state\n");
@@ -175,26 +181,27 @@ namespace Keypad {
 
 		if(key == '*') {	//Check if this is the reset command
 			//Clear the display
-			input[0] = '-';
-			input[1] = '-';
-			input[2] = '-';
-			input[3] = '-';
-			ipos = 0;
+			reset();
 			printf(INFO "Cleared the display\n");
-			return;
 		} else if(key == '#') {	//Check if this is the submit command
-			//Submit
-			printf(INFO "Process login event for user with ID %s\n", input);
-			input[0] = '-';
-			input[1] = '-';
-			input[2] = '-';
-			input[3] = '-';
-			ipos = 0;
-			State::changeState(State::READY);
+			//Check he number of digits
+			if(ipos < 4) {
+				//Not enough digits
+				printf(WARN "Not enough digits\n");
+			} else {
+				//Submit
+				printf(INFO "Process login event for user with ID %s\n", input);
+				//Clear the display
+				reset();
+				//Change the state back to ready
+				//TODO: Add user event handling
+				State::changeState(State::READY);
+			}
+			//Skip updating the display
 			return;
-		} else if(ipos > 3) {	//Check if this is the
-			//Not allowed
-			printf(WARN "Too many characters\n");
+		} else if(ipos > 3) {	//Check the number of digits
+			//Not allowed - too many digits
+			printf(WARN "Too many digits\n");
 		} else {
 			//Set the character
 			input[ipos] = key;
@@ -203,9 +210,24 @@ namespace Keypad {
 		}
 
 		//Update the display
-		LCD::goTo(0,6);
-		LCD::writeMessage(input);
+		LCD::writeMessage(input,0,6);
 
+	}
+
+	/*!	Input buffer reset method.
+	 *
+	 * 	This method clears the input buffer and digit position counter. This
+	 * 	method does not update the display, however, which must still be done
+	 * 	manually if that is the desired behavior.
+	 */
+	void reset() {
+		//Clear the buffer
+		input[0] = '-';
+		input[1] = '-';
+		input[2] = '-';
+		input[3] = '-';
+		//Reset the position counter
+		ipos = 0;
 	}
 
 	/*!	Key index to character converter.

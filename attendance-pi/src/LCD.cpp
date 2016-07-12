@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <bcm2835.h>
 #include <unistd.h>
-
 #include <string>
+#include <mutex>
 
 #define I2C_SLAVE_ADDRESS	0x27
 
@@ -14,6 +14,9 @@
 #define ENABLE_BIT		0b00000100
 #define RDWR_BIT		0b00000010
 #define REGSELECT_BIT	0b00000001
+
+#define MODE_COMMAND	false
+#define MODE_CHARACTER	true
 
 /*!	@section mod_init Module Initialization
  *
@@ -68,6 +71,13 @@
  */
 namespace LCD {
 
+	//Private declaractions
+	void writeDisplay(char);		//Writes a byte to the DISPLAY
+	void writeExpander(char);		//Writes a byte to the EXPANDER
+	char encodeChar(char);			//Encodes character to display format
+	int writeRaw(char);
+	void setMode(bool mode);		//Sets the target register
+
 	///Weather or not the LCD backlight is on. true = on, false = off.
 	bool backlight = true;
 	///Register selector. true = character register, false = command register.
@@ -75,8 +85,8 @@ namespace LCD {
 	///Read/write register.  Currently unused.
 	bool readWrite = false;
 
-	///Busy flag
-	bool busy = false;
+	///Locking mutex
+	std::mutex lmux;
 
 	/*!	LCD Initialization Method.
 	 *
@@ -98,31 +108,37 @@ namespace LCD {
 		//Set the display slave address
 		bcm2835_i2c_setSlaveAddress(I2C_SLAVE_ADDRESS);
 
-		//Set display to command mode
-		regSelect = false;
+		/*	Bug - The initialization data must be sent twice, and at some point
+		 * 	during the process a message must be written to the display. I have
+		 * 	absolutely no idea why this is, but I've spent about 5 hours trying
+		 * 	to figure it out to no avail. This works for whatever reason, so it
+		 * 	should probably work well enough to sort of leave it the way it is.
+		 */
+		for(int i = 0; i < 2; i++) {
+			//Set display mode
+			setMode(MODE_COMMAND);
+			writeDisplay(0b00101000);	//Set mode to 4-bit 2 line 5x8 character
+			usleep(10000);
+			writeDisplay(0b00101000);	//Set mode to 4-bit 2 line 5x8 character
+			usleep(10000);
+			writeDisplay(0b00101000);	//Set mode to 4-bit 2 line 5x8 character
+			usleep(10000);
 
-		//Send the initialization data
-		writeByte(0b00100100);	//Set mode to 4-bit 2 line 5x8 character
-		usleep(2000);
-		writeByte(0b00100100);	//Do it again because sometimes it doesn't work
-		usleep(2000);
-		writeByte(0b00101000);	//One last time
-		usleep(2000);
+			writeDisplay(0b00001100);	//Set display on, cursor off, blink off
+			usleep(10000);
 
-		writeByte(0b00001100);	//Set display on, cursor off, blink off
-		usleep(2000);
+			writeDisplay(0b00000110);	//Set cursor to increment right, don't shift
+			usleep(10000);
 
-		writeByte(0b00000001);	//Clear the display
-		usleep(2000);
+			writeDisplay(0b00000001);	//Clear the display
+			usleep(10000);
 
-		writeByte(0b00000110);	//Set cursor to increment right without shifting
-		usleep(2000);
-
-		writeByte(0b00000001);	//Clear the display
-		usleep(2000);
+			//Write an empty message
+			writeMessage("!",0,0);
+		}
 
 		//Something must be wrong here but I have no idea
-		writeMessage("   Loading...");
+		writeMessage("   Loading...",0,0);
 
 		//Success
 		printf(OKAY "\n");
@@ -135,12 +151,12 @@ namespace LCD {
 	 */
 	void destroy() {
 		//Destroy the LCD
-		printf("[" WHITE "----" RESET "] Destroying LCD...");
+		printf(LOADING "Destroying LCD...");
 
 		bcm2835_i2c_end();
 
 		//Success
-		printf("\r[" GREEN "OKAY\n" RESET);
+		printf(OKAY "\n");
 	}
 
 	/*!	LCD write method.
@@ -155,7 +171,7 @@ namespace LCD {
 	 * 	@param byte	Byte to write to the LCD.  Note that the 4 higher order bits
 	 * 		will be ignored.
 	 */
-	void write(char byte) {
+	void writeExpander(char byte) {
 		//Shift the byte
 		byte = byte << 4;
 
@@ -165,16 +181,21 @@ namespace LCD {
 		if(regSelect) { byte += REGSELECT_BIT; }
 
 		//Write low
-		writeRaw(byte);
+		int r1 = writeRaw(byte);
 		usleep(100);
 
 		//Write high
-		writeRaw(byte | ENABLE_BIT);
+		int r2 = writeRaw(byte | ENABLE_BIT);
 		usleep(100);
 
 		//Write low
-		writeRaw(byte);
+		int r3 = writeRaw(byte);
 		usleep(100);
+
+		//Check for error
+		if(r1 + r2 + r3 > 0) {
+			printf(WARN "Write error: %i %i %i\n", r1, r2, r3);
+		}
 	}
 
 	/*!	Character write method.
@@ -183,19 +204,15 @@ namespace LCD {
 	 * 	understood by the LCD, specifies the proper register, and then sends it
 	 * 	to the LCD.
 	 *
-	 * 	@warning This method should never be called directly, as doing so may
-	 * 	result in i2c message synchronization issues.  Instead, use
-	 * 	@p writeMessage().
-	 *
 	 *	@param c	Character to display.
 	 */
-	void writeByte(char byte) {
+	void writeDisplay(char byte) {
 		//Split the character into two messages
 		char m1 = (byte & 0b11110000) >> 4;
 		char m2 = (byte & 0b00001111);
 		//Write the two messages
-		write(m1);
-		write(m2);
+		writeExpander(m1);
+		writeExpander(m2);
 
 		/*	This is old debugging code for communications to the LCD.  I was
 		 *	having troubles caused by an improperly set bit, and I ended up
@@ -216,9 +233,11 @@ namespace LCD {
 			} else if(byte == 0b00000011) {
 				ba += "return home (extra bit)";
 			} else if(byte & 0b10000000) {
-				ba += "set DDRAM address to " + (int) (byte & 0b01111111);
+				ba += "set DDRAM address to ";
+				ba += (int) (byte & 0b01111111);
 			} else if(byte & 0b01000000) {
-				ba += "set CGRAM address to " + (int) (byte & 0b00111111);
+				ba += "set CGRAM address to ";
+				ba += (int) (byte & 0b00111111);
 			} else if(byte & 0b00100000) {
 				ba += "set display function: ";
 				if(byte & 0b00010000) {
@@ -283,8 +302,7 @@ namespace LCD {
 
 		//DEBUG
 		printf("%s\n", ba.c_str());
-
-		*/
+	*/
 	}
 
 	/*!	Write a raw byte to the IO expander.
@@ -301,27 +319,37 @@ namespace LCD {
 		return bcm2835_i2c_write(message, 1);
 	}
 
-	/*! Write a message to the display.
+	/*! Sets cursor position and writes message to display.
 	 *
-	 * 	This method writes the null-terminated string @p message to the
-	 * 	display.
+	 * 	This message writes @message to the display starting at the coordinates
+	 * 	specified by the variables @row and @col.
 	 *
 	 * 	@param message	Null-terminated string to display
+	 * 	@param row	The row to write the message to
+	 * 	@param col	The column to write the message to
 	 */
-	void writeMessage(std::string message) {
-		//Wait for ready
-		wait();
+	void writeMessage(std::string message, int row, int col) {
+		//Lock thread to prevent simultaneous LCD operations
+		std::lock_guard<std::mutex> lock (lmux);
+
+		//Set the mode to comand
+		setMode(MODE_COMMAND);
+		//Calculate raw offset
+		int offset = (row * 64) + col;
+		//Create the command byte
+		char cmd = (offset & 0b01111111) | 0b10000000;
+		//Send the command
+		writeDisplay(cmd);
 
 		//Set mode to char
-		regSelect = true;
+		setMode(MODE_CHARACTER);
+		//printf(INFO "Printing message \"%s\" of length %i\n", message.c_str(), message.size());
 		//Encode the message
 		for (unsigned int i = 0; i < message.size(); i++) {
 			//Write encoded character
-			writeByte(encodeChar(message[i]));
+			writeDisplay(encodeChar(message.c_str()[i]));
 		}
-
-		//Clear busy flag
-		busy = false;
+		//printf(INFO "Finished printing message\n");
 	}
 
 	/*!	Clear the display.
@@ -330,16 +358,13 @@ namespace LCD {
 	 *	I don't know where you got that idea.
 	 */
 	void clear() {
-		//Wait for ready
-		wait();
+		//Lock thread to prevent simultaneous LCD operations
+		std::lock_guard<std::mutex> lock (lmux);
 
 		//Set mode to command
-		regSelect = false;
+		setMode(MODE_COMMAND);
 		//Send the command
-		writeByte(0b00000001);
-
-		//Clear the busy flag
-		busy = false;
+		writeDisplay(0b00000001);
 	}
 
 	/*!	Return cursor to home.
@@ -347,54 +372,13 @@ namespace LCD {
 	 * 	This method moves the cursor position back to zero.
 	 */
 	void home() {
-		//Wait for ready
-		wait();
+		//Lock thread to prevent simultaneous LCD operations
+		std::lock_guard<std::mutex> lock (lmux);
 
 		//Set mode to command
-		regSelect = false;
+		setMode(MODE_COMMAND);
 		//Send the command
-		writeByte(0b00000010);
-
-		//Clear busy flag
-		busy = false;
-	}
-
-	/*!	Go to the specified position.
-	 *
-	 * 	This method instructs the LCD module to change the cursor position to
-	 * 	the value of @p pos.
-	 *
-	 * 	@param pos	The position to move the LCD cursor to.
-	 */
-	void goTo(int row, int col) {
-		//Wait for ready
-		wait();
-
-		//Set mode to command
-		regSelect = false;
-		//Calculate raw offset
-		int offset = (row * 64) + col;
-		//Create the command byte
-		char cmd = (offset & 0b01111111) | 0b10000000;
-		//Send the command
-		writeByte(cmd);
-
-		//Clear busy flag
-		busy = false;
-	}
-
-	/*!	Wait for ready.
-	 *
-	 * 	Waits until the busy flag has been cleared before proceeding with the
-	 * 	requested operation.  This method also sets the busy flag to true as
-	 * 	quickly as possible to further reduce the risk of unintentionally
-	 * 	concurrent operations.
-	 */
-	void wait() {
-		//Violently waste CPU while waiting for the flag to clear
-		while(busy) { usleep(100); }
-		//Set the flag
-		busy = true;
+		writeDisplay(0b00000010);
 	}
 
 	/*!	Character encoder.
@@ -417,6 +401,17 @@ namespace LCD {
 		} else {
 			return c;
 		}
+	}
+
+	/*! Mode selector
+	 *
+	 * 	User-friendly approach to setting the appropriate register. For command
+	 * 	operations, the register selector should be set to LOW, whereas for
+	 * 	character write operations, it should be set to HIGH.
+	 */
+	void setMode(bool state) {
+		//Select the appropriate register
+		regSelect = state;
 	}
 
 }

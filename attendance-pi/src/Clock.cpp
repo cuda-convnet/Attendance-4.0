@@ -1,5 +1,6 @@
 #include "Clock.h"
 #include "LCD.h"
+#include "State.h"
 #include "ANSI.h"
 
 #include <stdio.h>
@@ -10,6 +11,10 @@
 #include <time.h>
 
 namespace Clock {
+
+	//Private declarations
+	void clockThread();
+	std::string getDate();
 
 	///Clock thead
 	std::thread cThread;
@@ -48,12 +53,12 @@ namespace Clock {
 
 		//Loop
 		while(run) {
+			//Check if allowed state
+			if(State::state != State::READY) { sleep(1); continue; }
 			//Get formatted date
 			date = getDate();
-			//Go to first space on second line
-			LCD::goTo(1,0);
 			//Write the message
-			LCD::writeMessage(date);
+			LCD::writeMessage(date,1,0);
 			//Delay
 			sleep(10);
 		}

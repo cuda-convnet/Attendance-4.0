@@ -16,8 +16,7 @@ namespace State {
 		//Check for state specific handlers
 		if(s == READY) {
 			//Display the ready text
-			LCD::home();
-			LCD::writeMessage("     Ready!     ");
+			LCD::writeMessage("     Ready!     ",0,0);
 		}
 	}
 
