@@ -322,7 +322,7 @@ namespace LCD {
 	/*! Sets cursor position and writes message to display.
 	 *
 	 * 	This message writes @message to the display starting at the coordinates
-	 * 	specified by the variables @row and @col.
+	 * 	specified by the variables @p row and @p col.
 	 *
 	 * 	@param message	Null-terminated string to display
 	 * 	@param row	The row to write the message to

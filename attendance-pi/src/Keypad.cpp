@@ -34,7 +34,7 @@ namespace Keypad {
 
 	//Private declarations
 	void handle(char);
-	void keyThread();
+	void thread();
 	char codeToChar(int);
 
 	///Thread termination condition
@@ -94,7 +94,7 @@ namespace Keypad {
 		}
 
 		//Start the GPIO monitor thread
-		pollThread = std::thread(keyThread);
+		pollThread = std::thread(thread);
 
 		//Success
 		printf(OKAY "\n");
@@ -120,17 +120,14 @@ namespace Keypad {
 		printf(OKAY "\n");
 	}
 
-	/*!	Keypad polling thread main method.
-	 *
-	 * 	@warning This method should never be called directly, as it blocks
-	 * 	indefinitely.
+	/*!	Keypad polling thread.
 	 *
 	 * 	This method is spawned as a new thread by the keypad initialization
 	 * 	process, and handles the dirty work of listening for when a user has
 	 * 	pressed one of the keys by continuously polling the GPIO pins.
 	 *
 	 */
-	void keyThread() {
+	void thread() {
 		//Loop
 		while(run) {
 			//Iterate over each input
