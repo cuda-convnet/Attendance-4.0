@@ -1,0 +1,70 @@
+.lbox {
+	/* Set the size of the login box */
+	width: 300px;
+	height: 180px;
+
+	/* Set the position of the login box */
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+
+	/* Set the style of the login box */
+	background-color: #404040;
+	border-radius: 10px;
+	box-shadow: 3px 3px 6px #101010;
+}
+
+.lbox .title {
+	/* Set the text style */
+	font-size: 200%;
+	text-shadow: 0 0 4px rgba(0,0,0,.25);
+
+	/* Set the box style */
+	width: 100%;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-align: center;
+	background-color: rgba(0,0,0,.1);
+}
+
+.lbox .form {
+	/* Set the box style */
+	padding: 10px;
+}
+
+.lbox .text {
+	padding-left: 18px;
+}
+
+.lbox input {
+	/* Set the box style */
+	border: none;
+	width: 100%;
+	text-align: center;
+	background-color: rgba(0,0,0,.1);
+	margin-top: 5px;
+	margin-bottom: 5px;
+
+	/* Set the text style */
+	color: white;
+	font-size: 120%;
+	text-align: center;
+	padding: 0;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+.lbox button {
+	/* Set the button style */
+	border: none;
+	width: 100%;
+	margin-top: 5px;
+	background-color: rgba(0,0,0,.1);
+
+	/* Set the text style */
+	color: white;
+	font-size: 120%;
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Ligerbots Attendance Management System v4</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="istyle.css">
+		<script src="script.js"></script>
+	</head>
+	<body>
+		<!-- Top bar -->
+		<div class="tbar">
+			<table class="table">
+				<tr>
+					<td class="logo">LigerBots Attendance Management System</td>
+					<!-- <td class="user">You are currently logged in as </td> -->
+				</tr>
+			</table>
+		</div>
+		<!-- Current users -->
+		<div class="pagebox" id="currentUsers">
+			<div class="title">Current Users</div>
+			<table id="cutable">
+				<tr>
+					<td class="no_border_left" style="min-width: 150px"><b>Name</b></td>
+					<td style="min-width: 100px"><b>Time In</b></td>
+					<td><b>Actions</b></td>
+				</tr>
+				<tr id="custatusrow">
+					<td id="culoadingcell"class="no_border_left no_border_bottom loading_cell" colspan="3">
+						<img height="40px" src="img/loading.svg">
+					</td>
+					<td id="cuerrorcell" style="display: none;" class="no_border_left no_border_bottom error_cell" colspan="3">
+						<!-- Error text goes here automatically -->
+					</td>
+					<td id="custatuscell" style="display: none;" class="no_border_left no_border_bottom status_cell" colspan="3">
+						<!-- Status text goes here automatically -->
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!-- Recent Events -->
+		<div class="pagebox" id="recentEvents">
+			<div class="title">Recent Events</div>
+			<table>
+				<tr>
+					<td class="no_border_left"><b>ID</b></td>
+					<td><b>Type</b></td>
+					<td><b>Source</b></td>
+					<td><b>Target</b></td>
+					<td><b>Time</b></td>
+					<td><b>Actions</b></td>
+				</tr>
+				<tr id="reloadingcell">
+					<td class="no_border_left no_border_bottom loading_cell" colspan="6">
+						<img height="40px" src="img/loading.svg">
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!-- All Users -->
+		<div class="pagebox" id="allUsers">
+			<div class="title">All Users</div>
+			<table id="autable">
+				<tr>
+					<td class="no_border_left"><b>#</b></td>
+					<td><b>First Name</b></td>
+					<td><b>Last Name</b></td>
+					<td><b>PIN</b></td>
+					<td><b>RFID UID</b></td>
+					<td><b>Actions</b></td>
+				</tr>
+				<tr id="austatusrow">
+					<td id="auloadingcell"class="no_border_left no_border_bottom loading_cell" colspan="6">
+						<img height="40px" src="img/loading.svg">
+					</td>
+					<td id="auerrorcell" style="display: none;" class="no_border_left no_border_bottom error_cell" colspan="6">
+						<!-- Error text goes here automatically -->
+					</td>
+					<td id="austatuscell" style="display: none;" class="no_border_left no_border_bottom status_cell" colspan="6">
+						<!-- Status text goes here automatically -->
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

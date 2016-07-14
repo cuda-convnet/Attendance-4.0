@@ -25,3 +25,6 @@ attendance-pi/Release
 *.bat
 
 attendance-pi/bcm2835
+
+attendance-web/api/config.php
+attendance-web/.htpasswd
