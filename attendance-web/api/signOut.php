@@ -36,14 +36,14 @@ $esi = json_decode($lastEvent['special'], true);
 //Check weather credits are to be kept or removed
 if($_GET['keepcredits'] == "true") {
 	//Create the admin event
-	$admin = createAdminEvent(TYPE_SIGNOUT1, "" . $lastEvent['id'], $_SERVER['PHP_AUTH_USER'], $_GET['note']);
+	$admin = createAdminEvent(TYPE_SIGNOUT_MAN1, "" . $lastEvent['id'], $_SERVER['PHP_AUTH_USER'], $_GET['note']);
 	//Add the admin event ID to the special data
 	array_push($esi['adminEventLog'],$admin);
 	//Update the event
 	updateCalendarEvent($lastEvent['id'], $lastEvent['userid'], $lastEvent['start'], time(), json_encode($esi));
 } else {
 	//Create the admin event
-	$admin = createAdminEvent(TYPE_SIGNOUT2, "" . $lastEvent->id, $_SERVER['PHP_AUTH_USER'], $_GET['note']);
+	$admin = createAdminEvent(TYPE_SIGNOUT_MAN2, "" . $lastEvent->id, $_SERVER['PHP_AUTH_USER'], $_GET['note']);
 	//Add the admin event ID to the special data
 	array_push($esi['adminEventLog'],$admin);
 	//Update the event

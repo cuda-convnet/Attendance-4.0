@@ -26,6 +26,7 @@ function loadUsers(loadFunction) {
 	//Set the callback handler
 	xmlHttp.onreadystatechange = function() {
 		if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+			console.log("Load Users Response: " + xmlHttp.responseText);
 			loadFunction(JSON.parse(xmlHttp.responseText));
 		}
 	}
@@ -38,6 +39,132 @@ function loadUsers_cb(response) {
 	loadCurrentUsers(response);
 	//Populate the all users table
 	loadAllUsers(response);
+}
+function loadEvents(loadFunction,count) {
+	//Get the request object
+	var xmlHttp = new XMLHttpRequest();
+	//Set the callback handler
+	xmlHttp.onreadystatechange = function() {
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+			console.log("Load Events Response: " + xmlHttp.responseText);
+			loadFunction(JSON.parse(xmlHttp.responseText));
+		}
+	}
+	//Send the request
+	xmlHttp.open("GET", "api/getEvents.php?count=" + count, true);
+	xmlHttp.send(null);
+}
+function loadEvents_cb(response) {
+	//Check if error
+	if(response.result == "error") {
+		//Hide other cells
+		document.getElementById("reloadingcell").style.display = "none";
+		document.getElementById("restatuscell").style.display = "none";
+		//Show the error cell
+		var ecell = document.getElementById("reerrorcell");
+		ecell.innerHTML = response.message + " (" + response.detail + ")";
+		ecell.style.display = "table-cell";
+	} else {
+		//Hide other cells
+		document.getElementById("reloadingcell").style.display = "none";
+		document.getElementById("reerrorcell").style.display = "none;";
+
+		//Get the table object
+		var table = document.getElementById("retable");
+
+		//Delete existing rows
+		var rows = table.getElementsByClassName("rerow");
+		for(var i = 0; i < rows.length; i++) {
+			rows.item(i).parentElement.removeChild(rows.item(i));
+		}
+
+		//Event counter
+		var ecount = 0;
+
+		//Process result
+		for(var key in response) {
+			//Increment event counter
+			ecount++;
+
+			//Create the new row
+			var nrow = document.createElement("tr");
+			nrow.className = "rerow";
+
+			//Create ID cell
+			var cellId = document.createElement("td");
+			//Hide the border on the left
+			cellId.style.borderLeft = "none";
+			//Create the cell contents
+			cellId.innerHTML = response[key].id;
+			//Add the cell to the row
+			nrow.appendChild(cellId);
+
+			//Create type cell
+			var cellType = document.createElement("td");
+			//Create the cell contents
+			switch(response[key].type) {
+				case 0: cellType.innerHTML = "UNKNOWN"; break;
+				case 1: cellType.innerHTML = "SIGNOUT_MAN1"; break;
+				case 2: cellType.innerHTML = "SIGNOUT_MAN2"; break;
+				case 3: cellType.innerHTML = "SIGNOUT_DEV"; break;
+				case 4: cellType.innerHTML = "SIGNIN_DEV"; break;
+				default: cellType.innerHTML = "UNDEFINED";
+			}
+			//Add the cell to the row
+			nrow.appendChild(cellType);
+
+			//Create reference row
+			var cellReference = document.createElement("td");
+			//Create cell ceontents
+			cellReference.innerHTML = response[key].reference;
+			//Add the cell to the row
+			nrow.appendChild(cellReference);
+
+			//Create who row
+			var cellWho = document.createElement("td");
+			//Create cell contents
+			cellWho.innerHTML = response[key].who;
+			//Add the cell to the row
+			nrow.appendChild(cellWho);
+
+			//Create time row
+			var cellTime = document.createElement("td");
+			//Create cell contents
+			cellTime.innerHTML = formatDate(new Date(parseInt(response[key].time)));
+			//Add the cell to the row
+			nrow.appendChild(cellTime);
+
+			//Create notes row
+			var cellNotes = document.createElement("td");
+			//Create cell contents
+			cellNotes.innerHTML = response[key].notes;
+			//Add the cell to the row
+			nrow.appendChild(cellNotes);
+
+			//Create the actions cell
+			var cellActions = document.createElement("td");
+			//Set the class name
+			cellActions.className = "action_cell";
+			//Set the uid attribute
+			cellActions.setAttribute("user_id", key);
+			//Add the buttons
+			//cellActions.appendChild(abSignout.cloneNode(true));
+			//cellActions.appendChild(abSignoutNC.cloneNode(true));
+			//cellActions.appendChild(abUserinfo.cloneNode(true));
+			//Add the cell to the row
+			nrow.appendChild(cellActions);
+
+			//Add the row to the table
+			table.appendChild(nrow);
+		}
+
+		//Make the status cell visible
+		var statuscell = document.getElementById("restatuscell");
+		statuscell.innerHTML = "Loaded " + ecount + " event" + (ecount != 1 ? "s" : "");
+		statuscell.style.display = "table-cell";
+		//Move the status row to the bottom of the table
+		table.appendChild(document.getElementById("restatusrow"));
+	}
 }
 function loadCurrentUsers(response) {
 	//Check if error
@@ -229,6 +356,7 @@ function showUserInfo(id) {
 }
 
 loadUsers(loadUsers_cb);
+loadEvents(loadEvents_cb,10);
 
 function formatDate(d) {
 	//Result string

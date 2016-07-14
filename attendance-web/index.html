@@ -41,18 +41,24 @@
 		<!-- Recent Events -->
 		<div class="pagebox" id="recentEvents">
 			<div class="title">Recent Events</div>
-			<table>
+			<table id="retable">
 				<tr>
 					<td class="no_border_left"><b>ID</b></td>
 					<td><b>Type</b></td>
-					<td><b>Source</b></td>
-					<td><b>Target</b></td>
+					<td><b>Reference</b></td>
+					<td><b>Who</b></td>
 					<td><b>Time</b></td>
-					<td><b>Actions</b></td>
+					<td><b>Notes</b></td>
 				</tr>
-				<tr id="reloadingcell">
-					<td class="no_border_left no_border_bottom loading_cell" colspan="6">
+				<tr id="restatusrow">
+					<td id="reloadingcell"class="no_border_left no_border_bottom loading_cell" colspan="6">
 						<img height="40px" src="img/loading.svg">
+					</td>
+					<td id="reerrorcell" style="display: none;" class="no_border_left no_border_bottom error_cell" colspan="6">
+						<!-- Error text goes here automatically -->
+					</td>
+					<td id="restatuscell" style="display: none;" class="no_border_left no_border_bottom status_cell" colspan="6">
+						<!-- Status text goes here automatically -->
 					</td>
 				</tr>
 			</table>

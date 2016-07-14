@@ -8,10 +8,10 @@ include("config.php");
 
 //Define constants
 define("TYPE_UNKNOWN", 0);	//Unknown state
-define("TYPE_SIGNOUT1", 1);	//Manual user sign out, hours preserved
-define("TYPE_SIGNOUT2", 2); //Manual user sign out, hours discarded
-define("TYPE_SIGNOUT3", 3); //User signed out via the device
-define("TYPE_SIGNIN1", 4);	//User signed in via the device
+define("TYPE_SIGNOUT_MAN1", 1);	//Manual user sign out, hours preserved
+define("TYPE_SIGNOUT_MAN2", 2); //Manual user sign out, hours discarded
+define("TYPE_SIGNOUT_DEV", 3); //User signed out via the device
+define("TYPE_SIGNIN_DEV", 4);	//User signed in via the device
 
 //Set the content type
 header("Content-Type: text/plain");

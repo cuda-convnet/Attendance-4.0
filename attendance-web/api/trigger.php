@@ -20,7 +20,7 @@ if($lastEvent && $lastEvent['end'] == 0) {	//Existing event that needs to be END
 	//Decode the event special information
 	$esi = json_decode($lastEvent['special'], true);
 	//Create the new admin event
-	$admin = createAdminEvent(TYPE_SIGNOUT3, "" . $lastEvent['id'], $_SERVER['PHP_AUTH_USER'], "");
+	$admin = createAdminEvent(TYPE_SIGNOUT_DEV, "" . $lastEvent['id'], $_SERVER['PHP_AUTH_USER'], "");
 	//Add the admin event ID to the special data
 	array_push($esi['adminEventLog'],$admin);
 	//Update the event
@@ -37,7 +37,7 @@ if($lastEvent && $lastEvent['end'] == 0) {	//Existing event that needs to be END
 	//Decode the event special information
 	$esi = json_decode($cevent['special'], true);
 	//Create the new admin event
-	$admin = createAdminEvent(TYPE_SIGNIN1, "" . $cevent['id'], $_SERVER['PHP_AUTH_USER'], "");
+	$admin = createAdminEvent(TYPE_SIGNIN_DEV, "" . $cevent['id'], $_SERVER['PHP_AUTH_USER'], "");
 	//Add the admin event ID to the special data
 	array_push($esi['adminEventLog'],$admin);
 	//Update the event
