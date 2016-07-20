@@ -1,0 +1,79 @@
+/* Set the default style for tables */
+table {
+	border-collapse: collapse;
+	margin: 10px 5px 10px 5px;
+}
+
+/* Set the default style for cells */
+table th,
+table td {
+	/* Border style */
+	border-left: 1px solid gray;
+	border-bottom: 1px solid gray;
+	/* Cell style */
+	padding: 5px 10px 5px 10px;
+}
+
+/* Set the default row header style */
+table th {
+	/* Text Style */
+	text-align: left;
+}
+
+/* Disable borders on the bottom row of tables */
+table tr:last-child td {
+	border-bottom: none;
+}
+
+/* Disable borders on the left collum of tables */
+table tr td:first-child,
+table tr th:first-child {
+	border-left: none;
+}
+
+/* Status row */
+table .status_row {
+	/* Status should be centered */
+	text-align: center;
+}
+
+/* Error cell */
+table .status_row .error_cell {
+	/* Hidden by default */
+	display: none;
+}
+
+/* Status cell */
+table .status_row .status_cell {
+	/* Hidden by default */
+	display: none;
+	/* Status message should be smaller and darker */
+	font-size: 80%;
+	color: gray;
+}
+
+/* Action cell */
+table .action_cell {
+	/* Reduced padding */
+	padding: 0 5px 0 5px;
+	/* Centered */
+	vertical-align: middle;
+	text-align: center;
+}
+
+/* Action cell icon */
+table .action_cell .action_icon {
+	/* Icon properties */
+	height: 1em;
+	vertical-align: middle;
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+/* Mobile table style */
+@media only screen and (max-device-width: 600px) {
+	/* Make tables fill width */
+	table {
+		width: calc(100% - 20px);
+	}
+}

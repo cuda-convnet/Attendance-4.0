@@ -1,4 +1,0 @@
-AuthType Basic
-AuthName "Top Secret"
-AuthUserFile "c:/xampp/htdocs/ligerbots/attendance/.htpasswd"
-Require valid-user

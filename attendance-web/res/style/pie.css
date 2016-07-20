@@ -1,0 +1,32 @@
+#pie1 {
+	fill: #AF0000;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#xpie1:hover {
+	fill: #DB0000;
+}
+#pie2 {
+	fill: #00AF00;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#xpie2:hover {
+	fill: #00DB00;
+}
+#pie3 {
+	fill: #0000AF;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#xpie3:hover {
+	fill: #0000DB;
+}
+#pie4 {
+	fill: #AFAF00;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#xpie4:hover {
+	fill: #DBDB00;
+}

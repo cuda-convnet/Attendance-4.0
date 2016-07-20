@@ -1,0 +1,91 @@
+.alert_background {
+	/* Set the format */
+	position: fixed;
+	width: 100vw;	height: 100vh;
+	top: 0;			left: 0;
+	text-align: center;
+	/* Set the alert style */
+	background-color: rgba(0,0,0,.5);
+}
+
+.alert_background .alert_box {
+	/* Set the box format */
+	background-color: #151515;
+	border: 2px solid black;
+	padding: 10px;
+	display: inline-block;
+	box-shadow: 0 0 50vw 10vw rgba(100,100,100,.5);
+	/* Set the position */
+	position: absolute;
+	bottom: 50%;
+	transform: translateX(-50%);
+}
+
+/* Expanded alert box */
+.alert_background .large_box {
+	/* Inherited box format */
+	background-color: #151515;
+	border: 2px solid black;
+	padding: 10px;
+	display: inline-block;
+	box-shadow: 0 0 50vw 10vw rgba(100,100,100,.5);
+	/* Set the expanded box format */
+	width: 80%;
+	height: 80vh;
+	bottom: 10px;
+	/* Set the position */
+	position: absolute;
+	left: 50%;	top: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
+
+.alert_background .alert_message {
+	/* Set format */
+	padding: 25px;
+}
+
+.alert_background .full_button {
+	/* Set the button properties */
+	width: 100%;
+}
+
+.alert_background .half_button {
+	/* Set the button properties */
+	width: 50%;
+}
+
+.alert_background b {
+	color: red;
+}
+
+.alert_background .error_container {
+	/* Set the padding */
+	padding: 25px;
+}
+
+.alert_background .centered {
+	/* Set the position of the element to be in the dead center of parent element */
+	position: absolute;
+	left: 50%;	top: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
+
+.alert_background .debug_advanced {
+	/* Box Format */
+	margin: 10px;
+	max-height: 70vh;
+	background-color: rgba(255,255,255,.1);
+	font-family: monospace;
+	overflow-y: scroll;
+	width: calc(100% - 20px);
+	text-align: left;
+}
+
+/* Mobile alert style */
+@media only screen and (max-device-width: 600px) {
+	/* Make alerts fill width */
+	.alert_background .alert_box {
+		width: 90%;
+		font-size: 120%;
+	}
+}

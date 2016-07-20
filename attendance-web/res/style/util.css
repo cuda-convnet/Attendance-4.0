@@ -1,0 +1,17 @@
+.error_container .error_message {
+	/* Set font style */
+	color: red;
+}
+
+.error_container .error_detail {
+	/* Set font style */
+	color: gray;
+	font-size: 80%;
+}
+
+.error_container .error_advanced {
+	/* Set font style */
+	color: #404040;
+	text-decoration: underline;
+	font-size: 80%;
+}

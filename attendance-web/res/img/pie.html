@@ -1,0 +1,128 @@
+<svg style="overflow: hidden; position: absolute; left: 0px; top: 0px;" xmlns="http://www.w3.org/2000/svg" width="210" version="1.1" height="210">
+<pdath stroke-width="6" opacity="1" d="M100,100L200,100L100,200Z" stroke="#880088" fill="none" style="opacity: 1;"></path>
+<pdath stroke-width="6" opacity="1" d="M100,100L200,100L100,200Z" stroke="#FF0000" fill="#000000" style="opacity: 1;"></path>
+</svg>
+<style>
+#pie1 {
+	fill: #300000;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#pie1:hover {
+	fill: #500000;
+}
+#pie2 {
+	fill: #003000;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#pie2:hover {
+	fill: #005000;
+}
+#pie3 {
+	fill: #000030;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#pie3:hover {
+	fill: #000050;
+}
+#pie4 {
+	fill: #300030;
+	stroke-width: 3px;
+	stroke: #151515;
+}
+#pie4:hover {
+	fill: #500050;
+}
+</style>
+<script>
+	function generatePie(centerX, centerY, startAngle, endAngle, radius) {
+		//Calculate the first point location
+		var p1x = ( Math.cos(startAngle *	(Math.PI / 180)) * radius ) + centerX;
+		var p1y = ( Math.sin(startAngle *	(Math.PI / 180)) * radius ) + centerY;
+		//Calculate the second point location
+		var p2x = ( Math.cos(endAngle *	(Math.PI / 180)) * radius ) + centerX;
+		var p2y = ( Math.sin(endAngle *	(Math.PI / 180)) * radius ) + centerY;
+
+		//Definition
+		var d = "";
+		//Specify the origin
+		d += "M" + centerX + "," + centerY;
+		//Travel in a straight line to the first point
+		d += "L" + p1x + "," + p1y;
+		//Travel in an arc to the second point
+		d += "A";
+			//Set the x and y radius of the arc
+			d += radius + "," + radius + ",";
+			//Set the x-axis rotation
+			d += "0,";
+			//Set the large-arc flag, 1 = angle > 180, 0 = angle < 180
+			d += (endAngle - startAngle > 180 ? "1," : "0,");
+			//Set the sweep flag
+			d += "1,"; //Not sure what this does
+			//Set the ending coordinates
+			d += p2x + "," + p2y;
+		//Return to center
+		d += "Z";
+
+		//Create the element
+		var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		//Set the properties
+		path.setAttribute("d",d);
+		path.setAttribute("stroke-width", "1");
+		path.setAttribute("opacity", "1");
+		path.setAttribute("style", "opacity: 1;");
+
+		//Return path object
+		return path;
+	}
+	/*
+	//Get the SVG
+	var svg = document.getElementsByTagName("svg")[0];
+	//Variables
+	var startX = 100;
+	var startY = 100;
+	var startAngle = 0;
+	var endAngle = 80 * (Math.PI / 180);
+	var radius = 100;
+	//Calculate first point
+	var p1x = Math.cos(startAngle) * radius;
+	var p1y = Math.sin(startAngle) * radius;
+	//Calculate second point
+	var p2x = Math.cos(endAngle) * radius;
+	var p2y = Math.sin(endAngle) * radius;
+	//Create the path
+	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	path.setAttribute("d",
+		//Set the start point
+		"M" + startX + "," + startY +
+		//Travel in a straight line to the first point
+		"L" + Math.floor(p1x + startX) + "," + Math.floor(p1y + startY) +
+		//Arc
+		"A" + radius + "," + radius + ",0," + (endAngle - startAngle > 180 ? "1" : "0") + ",1," + (p2x + startX) + "," + (p2y + startY) +
+		"Z");
+	path.setAttribute("fill", "#000000");
+	path.setAttribute("stroke", "#FF0000");
+	path.setAttribute("stroke-width", "6");
+	path.setAttribute("opacity", "1");
+	path.setAttribute("style", "opacity: 1;");
+	svg.appendChild(path);*/
+	var svg = document.getElementsByTagName("svg")[0];
+	//function nerp(i) {
+	//	if(i > 360) { i = 0; }
+	//	svg.innerHTML = "";
+	//	svg.appendChild(generatePie(500,500,0,i,100,i,i));
+	//	setTimeout(function() { nerp((i+2)); }, 50);
+	//}
+	//nerp(1);
+	var slice1 = generatePie(105,105,45,210,100);
+	slice1.id = "pie1";
+	var slice2 = generatePie(105,105,210,15,100);
+	slice2.id = "pie2";
+	var slice3 = generatePie(105,105,15,45,100);
+	slice3.id = "pie3"
+	svg.appendChild(slice1);
+	svg.appendChild(slice2);
+	svg.appendChild(slice3);
+</script>

@@ -1,0 +1,45 @@
+body, html{
+	/* Default style for the document */
+	font-family: sans-serif;
+	color: white;
+
+	/* Background style */
+	background-image: url("../img/bg.png");
+
+	/* Page format */
+	padding: 0;
+	margin: 0;
+}
+
+.box {
+	/* Box style */
+	background-color: #151515;
+	padding: 10px;
+	border: 2px solid black;
+}
+
+.topbar {
+	/* Bar style */
+	border: none;
+	border-bottom: 2px solid black;
+}
+
+.card {
+	/* Card style */
+	margin: 10px;
+	display: inline-block;
+}
+
+.cardname {
+	/* Card name style */
+	font-size: 130%;
+	text-align: left;
+}
+
+/* Mobile page style */
+@media only screen and (max-device-width: 600px) {
+	/* Make cards fill width */
+	.card {
+		display: block;
+	}
+}
