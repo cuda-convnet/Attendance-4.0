@@ -24,4 +24,27 @@ class Util {
 		//Return the generated error message container
 		return container;
 	}
+
+	static getCookie(name) {
+		//Convert to cookie name
+		var cname = name + "=";
+		//Get the cookies
+		var cookies = document.cookie.split(';');
+		//Search for the cookie
+		for(var i = 0; i < cookies.length; i++) {
+			//Get the cookie
+			var cookie = cookies[i];
+			//Do this thing I found on the internet
+			while(cookie.charAt(0) == ' ') {
+				cookie = cookie.substring(1);
+			}
+			//Check the cookie
+			if(cookie.indexOf(cname) == 0) {
+				//Return the cookie data
+				return cookie.substring(cname.length,cookie.length);
+			}
+		}
+		//Cookie does not exist
+		return undefined;
+	}
 }

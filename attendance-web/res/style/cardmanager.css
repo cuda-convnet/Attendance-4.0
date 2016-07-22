@@ -1,0 +1,8 @@
+.minicon {
+	/* Set the icon style */
+	max-height: .9em;
+	/* Set the icon position */
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}

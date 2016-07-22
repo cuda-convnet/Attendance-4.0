@@ -9,6 +9,11 @@ body, html{
 	/* Page format */
 	padding: 0;
 	margin: 0;
+	min-height: 100vh;
+	min-width: 1500px;
+
+	/* Position, required for absolute children */
+	position: relative;
 }
 
 .box {
@@ -24,10 +29,32 @@ body, html{
 	border-bottom: 2px solid black;
 }
 
+.bottombar {
+	/* "Taskbar" style */
+	border: none;
+	border-top: 2px solid black;
+	position: fixed;
+	bottom: 0;
+	width: calc(100vw - 20px);
+}
+
+.cardbox {
+	/* Align the cards to the center */
+	text-align: center;
+	display: inline-block;
+	width: 100%;
+	/* Padding to keep the footer from covering things up */
+	padding-bottom: 60px;
+}
+
 .card {
 	/* Card style */
 	margin: 10px;
-	display: inline-block;
+	display: none;
+	width: 30%;
+	display: none;
+	/* Position, required for absolutely positioned children */
+	position: relative;
 }
 
 .cardname {
@@ -36,10 +63,47 @@ body, html{
 	text-align: left;
 }
 
+.cardicon {
+	/* "Taskbar" entry style */
+	margin: 3px;
+	border: 2px solid #202020;
+	background: #101010;
+	padding: 3px;
+	display: inline-block;
+}
+
+/* Classes for making elements desktop or mobile specific */
+.desktop {
+	display: inherit;
+}
+.mobile {
+	display: none;
+}
+
 /* Mobile page style */
 @media only screen and (max-device-width: 600px) {
-	/* Make cards fill width */
+	/* Remove minimum width */
+	html, body {
+		min-width: 0px;
+	}
+	/* Make "taskbar" go to the bottom */
+	.bottombar {
+		position: absolute;
+		bottom: 0;
+	}
+	/* Set card style */
 	.card {
-		display: block;
+		width: calc(100% - 44px);
+	}
+	/* Set card box style */
+	.cardbox {
+		display: inline-block;
+	}
+	/* Classes for making elements desktop or mobile specific */
+	.desktop {
+		display: none;
+	}
+	.mobile {
+		display: inherit;
 	}
 }
