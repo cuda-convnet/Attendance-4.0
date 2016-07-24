@@ -22,10 +22,20 @@
 		<div class="box topbar desktop">Ligerbots Attendance Management System</div>
 		<div class="box topbar mobile">Ligerbots Attendance Management System [M]</div>
 
+		<!-- Mason box -->
+		<div class="masonbox" id="masonbox">
+			<div class="column" id="masoncol1"></div>
+			<div class="column" id="masoncol2"></div>
+			<div class="column" id="masoncol3"></div>
+		</div>
+
 		<!-- Card Box -->
-		<div class="cardbox" id="cardbox">
+		<div class="cardbox" id="cardbox"></div>
+
+		<!-- Inactive Card Box -->
+		<div class="inactivecardbox" id="inactivecards">
 			<!-- Current Users Box -->
-			<div class="box card" cardname="CurrentUsers">
+			<div class="box card" cardname="CurrentUsers" style="height:400px">
 				<!-- Card Title -->
 				<div class="cardname">Current Users<img class="minicon" src="res/img/icon/down.svg" onClick="CardManager.minimize(this.parentElement.parentElement)"></div>
 				<!-- User Table -->
@@ -46,7 +56,7 @@
 			</div>
 
 			<!-- Recent Events Box -->
-			<div class="box card" cardname="RecentEvents">
+			<div class="box card" cardname="RecentEvents" style="height:600px">
 				<!-- Card Title -->
 				<div class="cardname">Recent Events<img class="minicon" src="res/img/icon/down.svg" onClick="CardManager.minimize(this.parentElement.parentElement)"></div>
 				<!-- Events Table -->
@@ -87,6 +97,27 @@
 					</tr>
 				</table>
 			</div>
+
+			<!-- Add User Box -->
+			<div class="box card" cardname="AddUser">
+				<!-- Card Title -->
+				<div class="cardname">Add User<img class="minicon" src="res/img/icon/down.svg" onClick="CardManager.minimize(this.parentElement.parentElement)"></div>
+				<!-- Form -->
+				<table class="addusertable">
+					<tr>
+						<td>First Name:</td>
+						<td class="inputcell"><input name="fname"></td>
+					</tr>
+					<tr>
+						<td>Last Name:</td>
+						<td class="inputcell"><input name="lname"></td>
+					</tr>
+					<tr>
+						<td>Email:</td>
+						<td class="inputcell"><input name="email"></td>
+					</tr>
+				</table>
+			</div>
 		</div>
 
 		<!-- Card list box -->
@@ -94,6 +125,7 @@
 			<div class="cardicon" cardname="CurrentUsers" onClick="CardManager.maximize(this)"><g>Current Users</g></div>
 			<div class="cardicon" cardname="RecentEvents" onClick="CardManager.maximize(this)"><g>Recent Events</g></div>
 			<div class="cardicon" cardname="AllUsers"	  onClick="CardManager.maximize(this)"><g>All Users</g></div>
+			<div class="cardicon" cardname="AddUser"	  onClick="CardManager.maximize(this)"><g>Add User</g></div>
 		</div>
 
 		<!-- Scripts to run -->

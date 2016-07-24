@@ -47,14 +47,19 @@ body, html{
 	padding-bottom: 60px;
 }
 
+.inactivecardbox {
+	/* Don't want to see these */
+	display: none;
+}
+
 .card {
 	/* Card style */
 	margin: 10px;
-	display: none;
-	width: 30%;
-	display: none;
+	width: calc(100% - 44px);
 	/* Position, required for absolutely positioned children */
 	position: relative;
+	/* Text Style */
+	text-align: left;
 }
 
 .cardname {
@@ -70,6 +75,37 @@ body, html{
 	background: #101010;
 	padding: 3px;
 	display: inline-block;
+}
+
+.addusertable {
+
+}
+
+/* Properties for the input box cell */
+.addusertable .inputcell {
+	/* The Input box itsself will deal with the padding and stuff */
+	padding: 0;
+}
+/* Properties for the input box */
+.addusertable .inputcell input {
+	/* Fill it up */
+	height: 100%;	width: calc(100% - 10px);
+	border: none;
+	padding: 2.5px; margin: 2.5px;
+	/* Set the style */
+	color: white;
+	background-color: rgba(0,0,0,.1);
+	font-size: 100%; /* This is necessary for some reason */
+}
+
+/* Container for mason layout */
+.masonbox {
+}
+.masonbox .column {
+	/* Column style */
+	display: inline-block;
+	width: 33%;
+	vertical-align: text-top;
 }
 
 /* Classes for making elements desktop or mobile specific */
