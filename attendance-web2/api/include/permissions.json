@@ -1,0 +1,44 @@
+{
+	"users.list": {
+		"_done": true,
+		"name": "List Users",
+		"desc": "Permission to retrieve a list of all users and their information"
+	},
+	"users.create": {
+		"_done": true,
+		"name": "Create Users",
+		"desc": "Permission to create new users"
+	},
+	"users.modify": {
+		"_done": true,
+		"name": "Modify Users",
+		"desc": "Permission to modify existing user information"
+	},
+	"users.delete": {
+		"_done": true,
+		"name": "Delete Users",
+		"desc": "Permission to delete users"
+	},
+	"calendar.list": {
+		"_done": true,
+		"name": "List Calendar Events",
+		"desc": "Permission to retrieve a list of all sign in/out events"
+	},
+	"event.create": {
+		"name": "Create Calendar Events",
+		"desc": "Permission to create calendar events"
+	},
+	"event.modify": {
+		"name": "Modify Calendar Events",
+		"desc": "Permission to modify calendar events"
+	},
+	"event.delete": {
+		"name": "Delete Calendar Events",
+		"desc": "Permission to delete calendar events"
+	},
+	"event.trigger": {
+		"_done": true,
+		"name": "Trigger signin/out events",
+		"desc": "This permission should only be granted to the raspberry pi user"
+	}
+}

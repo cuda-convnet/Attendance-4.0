@@ -4,6 +4,7 @@
 #include "State.h"
 #include "LCD.h"
 #include "Buzzer.h"
+#include "UserHandler.h"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -108,7 +109,7 @@ namespace Keypad {
 	 */
 	void destroy() {
 		//Destroy the keypad
-		printf(LOADING "Destroy Keypad...");
+		printf(LOADING "Destroying Keypad...");
 		fflush(stdout);
 
 		//Instruct the thread to terminate
@@ -191,14 +192,15 @@ namespace Keypad {
 				//Beep
 				Buzzer::buzz(25000);
 			} else {
-				//Submit
-				printf(INFO "Process login event for user with ID %s\n", input);
+				//Trigger the event
+				UserHandler::triggerPin(input);
 				//Beep
 				Buzzer::buzz(25000);
+				//Sleep for 1 second
+				usleep(1000000);
 				//Clear the display
 				reset();
 				//Change the state back to ready
-				//TODO: Add user event handling
 				State::changeState(State::READY);
 				//Return
 				return;

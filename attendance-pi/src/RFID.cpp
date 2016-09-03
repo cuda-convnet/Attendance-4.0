@@ -3,6 +3,8 @@
 #include "LCD.h"
 #include "ANSI.h"
 #include "Buzzer.h"
+#include "UserHandler.h"
+#include "State.h"
 
 #include <bcm2835.h>
 #include <unistd.h>
@@ -152,16 +154,18 @@ namespace RFID {
 				//Check UID
 				if(result.uid.compare(lastUID) != 0 ||
 						std::difftime(std::time(0), lctime) > 1) {
-					//Display the UID on the screen
-					LCD::writeMessage(result.uid,0,4);
 					//Set the last UID variable
 					lastUID = result.uid;
 					//Set the last time variable
 					lctime = std::time(0);
-					//Print a message to the console
-					printf(INFO "Card UID: %s\n", result.uid.c_str());
+					//Trigger the event
+					UserHandler::triggerRfid(result.uid.c_str());
 					//Beep
 					Buzzer::buzz(50000);
+					//Wait 1 second
+					usleep(1000000);
+					//Change the state back to ready
+					State::changeState(State::READY);
 				}
 			}
 			//Delay before checking again

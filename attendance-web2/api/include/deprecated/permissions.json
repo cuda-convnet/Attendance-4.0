@@ -1,0 +1,14 @@
+{
+	"users": {
+		"list": false,
+		"create": false,
+		"modify": false,
+		"delete": false
+	},
+	"calendar": {
+		"list": false,
+		"create": false,
+		"modify": false,
+		"delete": false
+	}
+}

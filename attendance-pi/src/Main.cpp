@@ -4,6 +4,7 @@
 #include "Keypad.h"
 #include "RFID.h"
 #include "Clock.h"
+#include "UserHandler.h"
 
 #include "State.h"
 #include "HttpSend.h"
@@ -13,6 +14,9 @@
 #include <stdexcept>
 #include <bcm2835.h>
 #include <unistd.h>
+#include <string>
+#include <fstream>
+#include <streambuf>
 
 int main() {
 	//Change state
@@ -27,10 +31,12 @@ int main() {
 		Keypad::init();
 		RFID::init();
 		Clock::init();
-	} catch(const std::runtime_error& e) {
+		UserHandler::init();
+	} catch(const std::exception& e) {
 		//Catch the error
+		printf(FAIL "%s\n" RESET, e.what());
 		State::changeState(State::ERROR);
-		printf("[" RED "ERR " RESET "] %s\n" RESET, e.what());
+		exit(0);
 	}
 
 	//Read
@@ -43,6 +49,7 @@ int main() {
 	//Clean up time
 	State::changeState(State::STOPPING);
 	printf(INFO "Destroying components...\n");
+	UserHandler::destroy();
 	Clock::destroy();
 	RFID::destroy();
 	Keypad::destroy();
@@ -68,7 +75,33 @@ namespace Main {
 			throw std::runtime_error("Failed to initialize bcm2835 library");
 		}
 
-		//Success
+		//Create the configuration file input stream
+		//std::ifstream configFile("config.json");
+		//Parse the stream
+		//config << configFile;
+
+		//Check for expected configuration values
+		if(getenv("HTTP_USERNAME") == nullptr) {
+			throw std::runtime_error(
+					"Environment variable \"HTTP_USERNAME\" is not set");
+		}
+		if(getenv("HTTP_PASSWORD") == nullptr) {
+			throw std::runtime_error(
+					"Environment variable \"HTTP_PASSWORD\" is not set");
+		}
+		if(getenv("API_BASEURL") == nullptr) {
+			throw std::runtime_error(
+					"Environment variable \"API_BASEURL\" is not set");
+		}
+		if(getenv("API_LISTUSERS") == nullptr) {
+			throw std::runtime_error(
+					"Environment variable \"API_LISTUSERS\" is not set");
+		}
+		if(getenv("API_TRIGGER") == nullptr) {
+			throw std::runtime_error(
+					"Environment variable \"API_TRIGGER\" is not set");
+		}
+
 		printf(OKAY "\n");
 	}
 

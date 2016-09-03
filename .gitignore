@@ -28,3 +28,8 @@ attendance-pi/bcm2835
 
 attendance-web/api/config.php
 attendance-web/.htpasswd
+
+#CURL
+attendance-pi/curl-7.50.1/
+#That library for the chip on the thing
+attendance-pi/bcm2835-1.50/

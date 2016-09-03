@@ -7,7 +7,7 @@ BIN_DIR =../bin/
 #Compiler options
 COMPILER	=g++
 CFLAGS		=-c -Wall -std=c++11
-FLAGS		=-fexceptions -lbcm2835 -pthread
+FLAGS		=-fexceptions -lbcm2835 -pthread -lcurl
 
 #Output options
 BIN_NAME =attendance

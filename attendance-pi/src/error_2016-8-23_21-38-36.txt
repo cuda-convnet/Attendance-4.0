@@ -1,0 +1,14 @@
+Encountered an error while performing a json get request.  Details of the error are below:
+
+URL: https://attendance.arkazex.com/api/trigger.php?pin=1234
+Username: raspi
+Password: [not shown]
+Raw message:
+<br />
+<b>Notice</b>:  Undefined property: stdClass::$signedin in <b>D:\Users\Nicholas\Projects\Ligerbots\Attendance-4.0\attendance-web2\api\include\user.php</b> on line <b>123</b><br />
+<br />
+<b>Fatal error</b>:  Uncaught Error: Call to undefined function signIn() in D:\Users\Nicholas\Projects\Ligerbots\Attendance-4.0\attendance-web2\api\include\user.php:128
+Stack trace:
+#0 d:\users\nicholas\Projects\Ligerbots\Attendance-4.0\attendance-web2\api\trigger.php(40): User-&gt;signToggle()
+#1 {main}
+  thrown in <b>D:\Users\Nicholas\Projects\Ligerbots\Attendance-4.0\attendance-web2\api\include\user.php</b> on line <b>128</b><br />
