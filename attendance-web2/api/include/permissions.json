@@ -19,10 +19,20 @@
 		"name": "Delete Users",
 		"desc": "Permission to delete users"
 	},
+	"users.getinfo": {
+		"_done": true,
+		"name": "Get User Information",
+		"desc": "Permission to retrieve detailed user information"
+	},
 	"calendar.list": {
 		"_done": true,
 		"name": "List Calendar Events",
 		"desc": "Permission to retrieve a list of all sign in/out events"
+	},
+	"event.getuser": {
+		"_done": true,
+		"name": "Get a users calendar events",
+		"desc": "List all calendar events for a specific user"
 	},
 	"event.create": {
 		"name": "Create Calendar Events",
