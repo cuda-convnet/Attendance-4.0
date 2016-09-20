@@ -68,9 +68,15 @@ namespace Utils {
 			curl_easy_setopt(chandle, CURLOPT_PASSWORD, getenv("HTTP_PASSWORD"));
 			//Tell curl to write the response into the string
 			curl_easy_setopt(chandle, CURLOPT_WRITEDATA, &response);
+			curl_easy_setopt(chandle, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 			//Perform the ritual sacrifice / get request
-			curl_easy_perform(chandle);
-			//TODO: Error handling
+			CURLcode result = curl_easy_perform(chandle);
+			if (result != CURLE_OK) {
+				std::ostringstream err;
+				err << "CURL error: ";
+				err << result;
+				throw std::runtime_error(err.str());
+			}
 			//Create a json object
 			nlohmann::json json = nlohmann::json::parse(response);
 			//We're done here
@@ -96,7 +102,7 @@ namespace Utils {
 			//Save the error
 			Utils::writeError(message);
 			//TODO: Proper error handling here
-			return nullptr;
+			return  nlohmann::json::parse("{}");
 		}
 	}
 

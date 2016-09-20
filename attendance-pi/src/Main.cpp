@@ -7,7 +7,6 @@
 #include "UserHandler.h"
 
 #include "State.h"
-#include "HttpSend.h"
 #include "ANSI.h"
 
 #include <stdio.h>

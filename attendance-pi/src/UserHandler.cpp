@@ -3,6 +3,8 @@
 #include "UserHandler.h"
 #include "Utils.h"
 #include "LCD.h"
+#include "Buzzer.h"
+#include "State.h"
 
 #include <stdio.h>
 #include <curl/curl.h>
@@ -145,8 +147,7 @@ namespace UserHandler {
 			std::string fname = element["fname"].get<std::string>();
 			std::string pin = element["pin"].get<std::string>();
 			std::string rfid = element["rfid"].get<std::string>();
-			bool signedin =
-					element["signedin"].get<std::string>().c_str() == "1";
+			bool signedin = element["signedin"].get<bool>();
 			//Create the user object
 			User* user = new User(fname, pin, rfid, signedin);
 			//Push the user into the vector
