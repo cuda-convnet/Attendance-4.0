@@ -153,6 +153,8 @@ namespace LCD {
 		//Destroy the LCD
 		printf(LOADING "Destroying LCD...");
 
+		clear();
+
 		bcm2835_i2c_end();
 
 		//Success

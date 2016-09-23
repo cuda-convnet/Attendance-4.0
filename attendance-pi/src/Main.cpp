@@ -1,3 +1,5 @@
+#include "vs-intellisense-fix.hpp"
+
 #include "Main.h"
 #include "LCD.h"
 #include "Buzzer.h"
@@ -17,8 +19,25 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <signal.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+std::mutex m;
+std::condition_variable cv;
+
+void catch_signal(int signum) {
+	// notify main thread to die
+	cv.notify_one();
+}
 
 int main() {
+	// add signal handlers
+	struct sigaction action1 = {};
+	action1.sa_handler = catch_signal;
+	sigaction(SIGTERM, &action1, NULL);
+	sigaction(SIGINT, &action1, NULL);
 	//Change state
 	State::changeState(State::INIT);
 	//Initialize components
@@ -33,12 +52,13 @@ int main() {
 		Clock::init();
 
 		printf(INFO "Waiting for internet\n");
-		LCD::writeMessage("Waiting for", 0, 0);
-		LCD::writeMessage("internet...", 2, 0);
+		LCD::writeMessage("  Waiting for   ", 0, 0);
+		LCD::writeMessage("  internet...   ", 1, 0);
 		while (!Utils::hasInternetConnectivity()) {
 			usleep(5000000);
 		}
-
+		LCD::writeMessage("Loading users...", 0, 0);
+		LCD::writeMessage("                ", 1, 0);
 		UserHandler::init();
 	} catch(const std::exception& e) {
 		//Catch the error
@@ -51,8 +71,9 @@ int main() {
 	State::changeState(State::READY);
 	printf(INFO "Ready!\n");
 
-	usleep(600000000);
-
+	std::unique_lock<std::mutex> lk(m);
+	cv.wait(lk);
+	lk.release();
 
 	//Clean up time
 	State::changeState(State::STOPPING);

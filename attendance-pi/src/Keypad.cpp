@@ -194,7 +194,14 @@ namespace Keypad {
 				//Beep
 				Buzzer::buzz(25000);
 			} else {
-				if (std::string(input) == std::string("0000")) {
+				if (std::string(input) == std::string("0001")) {
+					Buzzer::buzz(25000);
+					reset();
+					LCD::writeMessage("Loading users...", 0, 0);
+					UserHandler::update();
+					State::changeState(State::READY);
+					return;
+				} else if (std::string(input) == std::string("0000")) {
 					Buzzer::buzz(25000);
 					State::changeState(State::INPUT_ASSIGN_RFID);
 					reset();

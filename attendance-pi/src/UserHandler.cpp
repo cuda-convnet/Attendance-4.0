@@ -1,3 +1,5 @@
+#include "vs-intellisense-fix.hpp"
+
 #include "ANSI.h"
 #include "json.hpp"
 #include "UserHandler.h"
@@ -10,6 +12,7 @@
 #include <curl/curl.h>
 #include <unordered_map>
 #include <cstring>
+#include <unistd.h>
 
 /*!	@section mod_init	Module Initialization
  *
@@ -195,8 +198,19 @@ namespace UserHandler {
 				url << getenv("API_TRIGGER");
 				url << "?pin=";
 				url << pin;
-				//Send the request TODO: Error checking
-				Utils::jsonGetRequest(url.str().c_str());
+				//Send the request
+				nlohmann::json resp = Utils::jsonGetRequest(url.str().c_str());
+				bool signedin = resp["signed_in"].get<bool>();
+				std::string actualResponse = resp["message"].get<std::string>();
+				if (signedin != users[i].signedin) {
+					// uh oh, problem
+					users[i].signedin = signedin;
+					LCD::writeMessage("                ", 0, 0);
+					LCD::writeMessage(actualResponse, 0, 0);
+					Buzzer::buzz(100000);
+					usleep(100000);
+					Buzzer::buzz(100000);
+				}
 				//Print to console
 				printf(OKAY "%s has been %s\n", users[i].fname.c_str(),
 					users[i].signedin ? "signed out" : "signed in");
@@ -206,7 +220,7 @@ namespace UserHandler {
 		}
 		//If the program reaches this point, there is no user with this pin
 		printf(FAIL "Pin %s does not belong to anyone!\n", pin);
-		LCD::writeMessage("     Invalid PIN", 0, 0);
+		LCD::writeMessage("Invalid PIN", 0, 0);
 		Buzzer::buzz(1000000);
 		//Change the state back to ready
 		State::changeState(State::READY);
@@ -254,8 +268,19 @@ namespace UserHandler {
 				url << getenv("API_TRIGGER");
 				url << "?rfid=";
 				url << rfid;
-				//Send the request TODO: Error checking
-				Utils::jsonGetRequest(url.str().c_str());
+				//Send the request
+				nlohmann::json resp = Utils::jsonGetRequest(url.str().c_str());
+				bool signedin = resp["signed_in"].get<bool>();
+				std::string actualResponse = resp["message"].get<std::string>();
+				if (signedin != users[i].signedin) {
+					// uh oh, problem
+					users[i].signedin = signedin;
+					LCD::writeMessage("                ", 0, 0);
+					LCD::writeMessage(actualResponse, 0, 0);
+					Buzzer::buzz(100000);
+					usleep(100000);
+					Buzzer::buzz(100000);
+				}
 				//Print to console
 				printf(OKAY "%s has been %s\n", users[i].fname.c_str(),
 					users[i].signedin ? "signed in" : "signed out");
@@ -265,7 +290,7 @@ namespace UserHandler {
 		}
 		//If the program reaches this point, there is no user with this pin
 		printf(FAIL "RFID %s does not belong to anyone!\n", rfid);
-		LCD::writeMessage("     Invalid RFID", 0, 0);
+		LCD::writeMessage("Invalid RFID", 0, 0);
 		Buzzer::buzz(1000000);
 		//Change the state back to ready
 		State::changeState(State::READY);

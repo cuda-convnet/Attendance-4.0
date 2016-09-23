@@ -1,3 +1,5 @@
+#include "vs-intellisense-fix.hpp"
+
 #include "Clock.h"
 #include "LCD.h"
 #include "State.h"
@@ -5,6 +7,9 @@
 
 #include <stdio.h>
 #include <thread>
+#include <mutex>
+#include <chrono>
+#include <condition_variable>
 #include <ctime>
 #include <unistd.h>
 #include <string>
@@ -18,8 +23,10 @@ namespace Clock {
 
 	///Clock thead
 	std::thread cThread;
+	std::mutex m;
 	///Clock thread termination condition
 	bool run = true;
+	std::condition_variable cv;
 
 	void init() {
 		//Initialize the clock
@@ -40,6 +47,7 @@ namespace Clock {
 
 		//Instruct the thread to terminate
 		run = false;
+		cv.notify_one();
 		//Join the thread
 		cThread.join();
 
@@ -51,17 +59,23 @@ namespace Clock {
 		//Current time variable
 		std::string date;
 
+		std::unique_lock<std::mutex> lk(m);
+
 		//Loop
 		while(run) {
 			//Check if allowed state
-			if(State::state != State::READY) { sleep(1); continue; }
+			if(State::state != State::READY) {
+				cv.wait_for(lk, std::chrono::seconds(1));
+				continue;
+			}
 			//Get formatted date
 			date = getDate();
 			//Write the message
 			LCD::writeMessage(date,1,0);
 			//Delay
-			sleep(10);
+			cv.wait_for(lk, std::chrono::seconds(10));
 		}
+		lk.release();
 	}
 
 	std::string getDate() {
