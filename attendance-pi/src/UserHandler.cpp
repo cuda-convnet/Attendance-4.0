@@ -272,4 +272,49 @@ namespace UserHandler {
 
 	}
 
+	/*!	Assign RFID to PIN method
+	*
+	* 	This method sends a request to assign an RFID tag
+	*   to the user with the specified pin
+	*/
+	void assignRfidToPin(char* pin, const char* rfid) {
+		//Try and find the user
+		for (int i = 0; i < users.size(); i++) {
+			//Check the pin
+			//The next 3 print statements might get angry if you delete them
+			//printf("Checking if this is %s whose ID is %s...\n", users[i].fname.c_str(), users[i].pin.c_str());
+			//printf("Comparing ID [%s] and [%s]\n", users[i].pin.c_str(), pin);
+			//printf("Result: %i\n", users[i].pin.compare(pin));
+			if (users[i].pin.compare(pin) == 0) {
+				//Message to show to the user
+				std::string message = "Assigning tag...";
+				//Show that message to their face
+				LCD::writeMessage(message, 0, 0);
+				//Create the trigger url
+				std::ostringstream url;
+				url << getenv("API_BASEURL");
+				url << getenv("API_ASSIGN");
+				url << "?pin=";
+				url << pin;
+				url << "&rfid=";
+				url << rfid;
+				//Send the request TODO: Error checking
+				Utils::jsonGetRequest(url.str().c_str());
+				// update local db
+				users[i].rfid = std::string(rfid);
+				//Print to console
+				printf(OKAY "%s has been given rfid %s\n", users[i].fname.c_str(),
+					rfid);
+				//Finished
+				return;
+			}
+		}
+		//If the program reaches this point, there is no user with this pin
+		printf(FAIL "Pin %s does not belong to anyone!\n", pin);
+		LCD::writeMessage("     Invalid PIN", 0, 0);
+		Buzzer::buzz(1000000);
+		//Change the state back to ready
+		State::changeState(State::READY);
+	}
+
 }

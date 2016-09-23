@@ -158,8 +158,12 @@ namespace RFID {
 					lastUID = result.uid;
 					//Set the last time variable
 					lctime = std::time(0);
-					//Trigger the event
-					UserHandler::triggerRfid(result.uid.c_str());
+					if (State::state == State::READ_ASSIGN_RFID) {
+						UserHandler::assignRfidToPin(State::assignRfidPin, result.uid.c_str());
+					} else {
+						//Trigger the event
+						UserHandler::triggerRfid(result.uid.c_str());
+					}
 					//Beep
 					Buzzer::buzz(50000);
 					//Wait 1 second

@@ -4,6 +4,8 @@
 
 namespace State {
 
+	char assignRfidPin[] = "----";
+
 	//Application state
 	State state = State::PRE_INIT;
 

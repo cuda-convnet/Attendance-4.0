@@ -5,6 +5,7 @@
 #include "RFID.h"
 #include "Clock.h"
 #include "UserHandler.h"
+#include "Utils.h"
 
 #include "State.h"
 #include "ANSI.h"
@@ -30,6 +31,14 @@ int main() {
 		Keypad::init();
 		RFID::init();
 		Clock::init();
+
+		printf(INFO "Waiting for internet\n");
+		LCD::writeMessage("Waiting for", 0, 0);
+		LCD::writeMessage("internet...", 2, 0);
+		while (!Utils::hasInternetConnectivity()) {
+			usleep(5000000);
+		}
+
 		UserHandler::init();
 	} catch(const std::exception& e) {
 		//Catch the error
@@ -99,6 +108,10 @@ namespace Main {
 		if(getenv("API_TRIGGER") == nullptr) {
 			throw std::runtime_error(
 					"Environment variable \"API_TRIGGER\" is not set");
+		}
+		if (getenv("API_ASSIGN") == nullptr) {
+			throw std::runtime_error(
+				"Environment variable \"API_ASSIGN\" is not set");
 		}
 
 		printf(OKAY "\n");

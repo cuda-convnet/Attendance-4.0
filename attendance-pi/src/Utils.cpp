@@ -71,6 +71,7 @@ namespace Utils {
 			curl_easy_setopt(chandle, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 			//Perform the ritual sacrifice / get request
 			CURLcode result = curl_easy_perform(chandle);
+			curl_easy_cleanup(chandle);
 			if (result != CURLE_OK) {
 				std::ostringstream err;
 				err << "CURL error: ";
@@ -151,5 +152,37 @@ namespace Utils {
 		ss << (now->tm_sec);
 		//Return the time
 		return ss.str();
+	}
+
+	/*! Check for internet connectivity
+	*
+	* 	This method returns true if the pi can connect
+	*   to the attendance server, false otherwise
+	*/
+	bool hasInternetConnectivity() {
+		CURL *curl = curl_easy_init();;
+		CURLcode res;
+
+		bool hasInternet = true;
+
+		curl_easy_setopt(curl, CURLOPT_URL, getenv("API_BASEURL"));
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+			Utils::curlParseCallback);
+		std::string response;
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+		if ((res = curl_easy_perform(curl)) != CURLE_OK) {
+			switch (res) {
+			case CURLE_COULDNT_CONNECT:
+			case CURLE_COULDNT_RESOLVE_HOST:
+			case CURLE_COULDNT_RESOLVE_PROXY:
+				hasInternet = false;
+				break;
+			default:
+				break; // site error, guess we just continue
+			}
+		}
+
+		curl_easy_cleanup(curl);
+		return hasInternet;
 	}
 }

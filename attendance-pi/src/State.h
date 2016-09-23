@@ -7,6 +7,8 @@ namespace State {
 		INIT,
 		READY,
 		INPUT,
+		INPUT_ASSIGN_RFID,
+		READ_ASSIGN_RFID,
 		BUSY,
 		ERROR,
 		STOPPING,
@@ -17,4 +19,6 @@ namespace State {
 
 	void changeState(State);
 	char* getName(State);
+
+	extern char assignRfidPin[];
 }
