@@ -1,0 +1,6 @@
+export HTTP_USERNAME=attendance-pi
+export HTTP_PASSWORD=some-secure-password
+export API_BASEURL=https://attendance-backend.example/api/
+export API_LISTUSERS=listUsers.php
+export API_TRIGGER=trigger.php
+export API_ASSIGN=assign.php

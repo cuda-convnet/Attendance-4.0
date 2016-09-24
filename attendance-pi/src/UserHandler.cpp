@@ -13,6 +13,11 @@
 #include <unordered_map>
 #include <cstring>
 #include <unistd.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+#include <ctime>
 
 /*!	@section mod_init	Module Initialization
  *
@@ -49,6 +54,39 @@ namespace UserHandler {
 			//Constructor
 			User(std::string, std::string, std::string, bool);
 	};
+
+	//Periodic updating
+	std::thread updaterThread;
+	std::mutex m;
+	bool run = true;
+	std::condition_variable cv;
+
+	//Periodic update function
+	//this should run every day after the backend resets signed in users
+	void periodicUpdateThread() {
+		std::unique_lock<std::mutex> lk(m);
+		while (run) {
+			// get current time
+			time_t currentTs;
+			time(&currentTs);
+			tm* currentTime = localtime(&currentTs);
+			// add one day to current time, then set it to 3am
+			currentTime->tm_mday++;
+			currentTime->tm_hour = 3;
+			currentTime->tm_min = 0;
+			currentTime->tm_sec = 0;
+			time_t next = mktime(currentTime);
+			// wait until it's 3am
+			auto tp = std::chrono::system_clock::from_time_t(next);
+			cv.wait_until(lk, tp);
+			if (run) {
+				printf(INFO "Updating local database...\n");
+				State::changeState(State::BUSY);
+				update();
+				State::changeState(State::READY);
+			} // else we were rudely awakened by shutdown
+		}
+	}
 
 	/*! User object constructor
 	 *
@@ -100,8 +138,8 @@ namespace UserHandler {
 		//Perform global CURL initialization
 		curl_global_init(CURL_GLOBAL_SSL);
 
-		//TODO: The thing
 		update();
+		updaterThread = std::thread(periodicUpdateThread);
 
 		//Success
 		printf(OKAY "\n");
@@ -123,7 +161,9 @@ namespace UserHandler {
 		printf(LOADING "Destroy User Handler...");
 		fflush(stdout);
 
-		//TODO: The other thing (?)
+		run = false;
+		cv.notify_one();
+		updaterThread.join();
 
 		//Success
 		printf(OKAY "\n");
