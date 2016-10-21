@@ -17,6 +17,7 @@
 
 #define MODE_COMMAND	false
 #define MODE_CHARACTER	true
+#define LCD_SETCGRAMADDR 0x40
 
 /*!	@section mod_init Module Initialization
  *
@@ -88,6 +89,18 @@ namespace LCD {
 	///Locking mutex
 	std::mutex lmux;
 
+	void createChar(char ascii, char data[8]) {
+		setMode(MODE_COMMAND);
+		char location = ascii & 0x7;
+		writeDisplay(LCD_SETCGRAMADDR | (location << 3));
+		usleep(50000);
+		setMode(MODE_CHARACTER);
+		for (int i = 0; i < 8; i++) {
+			writeDisplay(data[i]);
+			usleep(50000);
+		}
+	}
+
 	/*!	LCD Initialization Method.
 	 *
 	 * 	This method initializes the bcm2835's I2C interface, then sends the
@@ -137,8 +150,41 @@ namespace LCD {
 			writeMessage("!",0,0);
 		}
 
-		//Something must be wrong here but I have no idea
-		writeMessage("   Loading...",0,0);
+		writeMessage("   Loading...", 0, 0);
+
+		char noNet[8] = {
+			0B00000,
+			0B00000,
+			0B00000,
+			0B10001,
+			0B01010,
+			0B00100,
+			0B01010,
+			0B10001
+		};
+		createChar(CHAR_NO_NET, noNet);
+		char eth[8] = {
+			0B00000,
+			0B00100,
+			0B10101,
+			0B10101,
+			0B10001,
+			0B01110,
+			0B00100,
+			0B00100
+		};
+		createChar(CHAR_ETH, eth);
+		char wifi[8] = {
+			0B00000,
+			0B00000,
+			0B00000,
+			0B11100,
+			0B00010,
+			0B11001,
+			0B00101,
+			0B10101
+		};
+		createChar(CHAR_WIFI, wifi);
 
 		//Success
 		printf(OKAY "\n");
@@ -398,7 +444,8 @@ namespace LCD {
 		// (except the yen symbol which seems to be randomly in there
 		// in the place of '\'.
 		// not that we use the yen symbol or \ anyway)
-		if (c < 32 || c > 125) {
+		// also, chars 0-7 can be assigned in the CGRAM
+		if (c > 7 && (c < 32 || c > 125)) {
 			return '?';
 		} else {
 			return c;

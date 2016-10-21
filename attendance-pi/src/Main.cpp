@@ -26,9 +26,11 @@
 
 std::mutex m;
 std::condition_variable cv;
+bool running = true;
 
 void catch_signal(int signum) {
 	// notify main thread to die
+	running = false;
 	cv.notify_one();
 }
 
@@ -51,28 +53,64 @@ int main() {
 		RFID::init();
 		Clock::init();
 
-		printf(INFO "Waiting for internet\n");
-		LCD::writeMessage("  Waiting for   ", 0, 0);
-		LCD::writeMessage("  internet...   ", 1, 0);
-		while (!Utils::hasInternetConnectivity()) {
-			usleep(5000000);
-		}
-		LCD::writeMessage("Loading users...", 0, 0);
-		LCD::writeMessage("                ", 1, 0);
 		UserHandler::init();
 	} catch(const std::exception& e) {
 		//Catch the error
+		printf("\n\n");
 		printf(FAIL "%s\n" RESET, e.what());
 		State::changeState(State::ERROR);
 		exit(0);
 	}
 
-	//Read
-	State::changeState(State::READY);
-	printf(INFO "Ready!\n");
+	fflush(stdout);
+	fflush(stderr);
 
+	State::changeState(State::NO_INTERNET);
+	bool usersNeedUpdate = false;
 	std::unique_lock<std::mutex> lk(m);
-	cv.wait(lk);
+
+	while (true) {
+		std::vector<Utils::ConnectionState> cs = Utils::getConnectionState();
+		if (cs.size() == 0) {
+			State::haveWifi = false;
+			State::haveEthernet = false;
+			State::changeState(State::NO_INTERNET);
+			Clock::wakeup();
+		} else {
+			bool wifi = false, ethernet = false;
+			for (int i = 0; i < cs.size(); i++) {
+				if (cs[i].connectionType == Utils::WIFI) {
+					wifi = true;
+				} else if (cs[i].connectionType == Utils::ETHERNET) {
+					ethernet = true;
+				}
+			}
+			State::haveWifi = wifi;
+			State::haveEthernet = ethernet;
+
+			if (State::state == State::NO_INTERNET) {
+				if (usersNeedUpdate) {
+					LCD::writeMessage("Loading users...", 0, 0);
+					if (UserHandler::update()) {
+						usersNeedUpdate = false;
+						State::changeState(State::READY);
+						Clock::wakeup();
+					}
+				} else {
+					State::changeState(State::READY);
+					Clock::wakeup();
+				}
+			}
+		}
+
+		// wait 5 secs until we poll again, or until interrupted by a signal
+		cv.wait_for(lk, std::chrono::seconds(5));
+		if (!running) {
+			// interrupted, time to clean up and exit
+			break;
+		}
+	}
+
 	lk.release();
 
 	//Clean up time

@@ -5,6 +5,7 @@ namespace State {
 	enum State {
 		PRE_INIT,
 		INIT,
+		NO_INTERNET,
 		READY,
 		INPUT,
 		INPUT_ASSIGN_RFID,
@@ -16,6 +17,8 @@ namespace State {
 	};
 
 	extern State state;
+	extern bool haveEthernet;
+	extern bool haveWifi;
 
 	void changeState(State);
 	char* getName(State);

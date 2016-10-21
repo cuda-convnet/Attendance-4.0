@@ -4,6 +4,7 @@
 #include "LCD.h"
 #include "State.h"
 #include "ANSI.h"
+#include "Utils.h"
 
 #include <stdio.h>
 #include <thread>
@@ -64,14 +65,32 @@ namespace Clock {
 		//Loop
 		while(run) {
 			//Check if allowed state
-			if(State::state != State::READY) {
+			if(State::state != State::READY && State::state != State::NO_INTERNET) {
 				cv.wait_for(lk, std::chrono::seconds(1));
 				continue;
 			}
 			//Get formatted date
 			date = getDate();
+
 			//Write the message
-			LCD::writeMessage(date,1,0);
+			std::string str;
+			str += date;
+			str += "  ";
+			if (State::haveEthernet && State::haveWifi) {
+				str += CHAR_ETH;
+				str += CHAR_WIFI;
+			} else if (State::haveEthernet) {
+				str += ' ';
+				str += CHAR_ETH;
+			} else if (State::haveWifi) {
+				str += ' ';
+				str += CHAR_WIFI;
+			} else {
+				str += ' ';
+				str += CHAR_NO_NET;
+			}
+			
+			LCD::writeMessage(str, 1, 0);
 			//Delay
 			cv.wait_for(lk, std::chrono::seconds(10));
 		}
@@ -86,7 +105,11 @@ namespace Clock {
 		//Calculate time
 		tstruct = *std::localtime(&now);
 		//Convert to string
-		std::strftime(buf, sizeof(buf), "%m/%d      %I:%M", &tstruct);
+		std::strftime(buf, sizeof(buf), "%m/%d  %I:%M", &tstruct);
 		return buf;
+	}
+
+	void wakeup() {
+		cv.notify_one();
 	}
 }

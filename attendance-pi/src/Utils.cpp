@@ -2,14 +2,122 @@
 #include "json.hpp"
 #include "ANSI.h"
 #include "Buzzer.h"
+#include "LCD.h"
 
 #include <curl/curl.h>
 #include <fstream>
 #include <ctime>
+#include <vector>
+
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <ifaddrs.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <linux/wireless.h>
+#include <netinet/in.h>
+#include <errno.h>
 
 using namespace std;
 
 namespace Utils {
+
+	bool _jsonGetRequestSuccess = false;
+
+	/*! Checks an individual interface's status
+	 * 
+	 * @return A ConnectionState struct describing the status of the interface
+	 */
+	ConnectionState checkInterface(const char* ifname) {
+		ConnectionState connectionState;
+		connectionState.dBm = 0;
+		connectionState.connectionType = NO_CONNECTION;
+
+		int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+		if (sock < 0) {
+			printf(WARN "socket() error: %d\n", errno);
+			return connectionState;
+		}
+
+		// first check if the interface is up
+		struct ifreq if_req = {};
+		strncpy(if_req.ifr_name, ifname, IFNAMSIZ);
+		int rv = ioctl(sock, SIOCGIFFLAGS, &if_req);
+
+		if (rv == -1) {
+			printf(WARN "ioctl() error: %d\n", errno);
+			return connectionState;
+		}
+
+		if (!((if_req.ifr_flags & IFF_UP) && (if_req.ifr_flags & IFF_RUNNING))) {
+			// it's not up
+			return connectionState;
+		}
+
+		// then check what type of interface it is
+		struct iwreq iw_req = {};
+		strncpy(iw_req.ifr_name, ifname, IFNAMSIZ);
+		if (ioctl(sock, SIOCGIWNAME, &iw_req) != -1) {
+			connectionState.connectionType = WIFI;
+
+			// check the signal strength
+			iw_req.u.data.pointer = (iw_statistics*) malloc(sizeof(iw_statistics));
+			iw_req.u.data.length = sizeof(iw_statistics);
+			if (ioctl(sock, SIOCGIWSTATS, &iw_req) == -1) {
+				printf(WARN "ioctl() error: %d\n", errno);
+			} else if (((iw_statistics*) iw_req.u.data.pointer)->qual.updated & IW_QUAL_DBM) {
+				// signal is measured in dBm and is valid for us to use
+				connectionState.dBm = ((iw_statistics*) iw_req.u.data.pointer)->qual.level /*- 256*/;
+			} else {
+				connectionState.dBm = -1; // unknown
+			}
+		} else {
+			connectionState.connectionType = ETHERNET;
+		}
+
+		close(sock);
+
+		return connectionState;
+	}
+
+	/*! Checks the status for all network interfaces that are up and running
+	*
+	* @return A vector of ConnectionState structs for each interface that is up and running
+	*/
+	std::vector<ConnectionState> getConnectionState() {
+		struct ifaddrs* ifaddr;
+		struct ifaddrs* ifa;
+		std::vector<ConnectionState> retval;
+
+		// find all interfaces
+		if (getifaddrs(&ifaddr) == -1) {
+			printf(WARN "getifaddrs() error\n");
+
+			return retval;
+		}
+
+		// check status of each interface
+		for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+			if (ifa->ifa_addr == NULL ||
+				ifa->ifa_addr->sa_family != AF_PACKET)
+				continue;
+
+			if (ifa->ifa_flags & IFF_LOOPBACK)
+				continue;
+
+			ConnectionState cs = checkInterface(ifa->ifa_name);
+			if (cs.connectionType != NO_CONNECTION) {
+				// this is a network that is up
+				retval.push_back(cs);
+			}
+		}
+
+		freeifaddrs(ifaddr);
+		
+		return retval;
+	}
 
 	//Get time prototype
 	string getTime();
@@ -81,8 +189,10 @@ namespace Utils {
 			//Create a json object
 			nlohmann::json json = nlohmann::json::parse(response);
 			//We're done here
+			_jsonGetRequestSuccess = true;
 			return json;
 		} catch(exception e) {
+			LCD::writeMessage("Request error   ", 0, 0);
 			//Make an error sound
 			Buzzer::buzz(1000000);
 			//Something went wrong!
@@ -103,8 +213,13 @@ namespace Utils {
 			//Save the error
 			Utils::writeError(message);
 			//TODO: Proper error handling here
+			_jsonGetRequestSuccess = false;
 			return  nlohmann::json::parse("{}");
 		}
+	}
+
+	bool jsonGetRequestSuccess() {
+		return _jsonGetRequestSuccess;
 	}
 
 	/*! Write an error detail to the disk

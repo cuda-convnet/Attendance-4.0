@@ -138,17 +138,11 @@ namespace UserHandler {
 		//Perform global CURL initialization
 		curl_global_init(CURL_GLOBAL_SSL);
 
-		update();
 		updaterThread = std::thread(periodicUpdateThread);
 
 		//Success
 		printf(OKAY "\n");
 	}
-
-	/*!	CURL Write callback method
-	 *
-	 *
-	 */
 
 	/*!	User Handler Destruction Method.
 	 *
@@ -164,6 +158,7 @@ namespace UserHandler {
 		run = false;
 		cv.notify_one();
 		updaterThread.join();
+		curl_global_cleanup();
 
 		//Success
 		printf(OKAY "\n");
@@ -174,12 +169,15 @@ namespace UserHandler {
 	 * 	This method sends a request to the server to retrieve an updated user
 	 * 	information table, which it then decodes and stores in memory.
 	 */
-	void update() {
+	bool update() {
 		//Create the request
 		std::string url = getenv("API_BASEURL");
 		url += getenv("API_LISTUSERS");
 		//Send a get request
 		nlohmann::json json = Utils::jsonGetRequest(url.c_str());
+		if (!Utils::jsonGetRequestSuccess()) {
+			return false;
+		}
 		//Remove existing user records
 		users.clear();
 		//Iterate the elements in the response
@@ -196,6 +194,7 @@ namespace UserHandler {
 			//Push the user into the vector
 			users.push_back(*user);
 		}
+		return true;
 	}
 
 	/*!	Trigger by Pin method
