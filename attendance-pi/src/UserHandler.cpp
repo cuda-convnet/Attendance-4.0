@@ -259,7 +259,7 @@ namespace UserHandler {
 		}
 		//If the program reaches this point, there is no user with this pin
 		printf(FAIL "Pin %s does not belong to anyone!\n", pin);
-		LCD::writeMessage("Invalid PIN", 0, 0);
+		LCD::writeMessage("Invalid PIN     ", 0, 0);
 		Buzzer::buzz(1000000);
 		//Change the state back to ready
 		State::changeState(State::READY);
@@ -329,7 +329,7 @@ namespace UserHandler {
 		}
 		//If the program reaches this point, there is no user with this pin
 		printf(FAIL "RFID %s does not belong to anyone!\n", rfid);
-		LCD::writeMessage("Invalid RFID", 0, 0);
+		LCD::writeMessage("Invalid RFID    ", 0, 0);
 		Buzzer::buzz(1000000);
 		//Change the state back to ready
 		State::changeState(State::READY);

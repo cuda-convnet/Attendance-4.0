@@ -22,4 +22,6 @@ namespace Utils {
 	std::vector<ConnectionState> getConnectionState();
 
 	void writeError(std::string);
+
+	void shutdownPi();
 }

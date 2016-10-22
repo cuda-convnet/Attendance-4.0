@@ -300,4 +300,8 @@ namespace Utils {
 		curl_easy_cleanup(curl);
 		return hasInternet;
 	}
+
+	void shutdownPi() {
+		system("shutdown -h now");
+	}
 }

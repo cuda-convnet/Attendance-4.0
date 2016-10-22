@@ -5,6 +5,7 @@
 #include "LCD.h"
 #include "Buzzer.h"
 #include "UserHandler.h"
+#include "Utils.h"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -194,7 +195,9 @@ namespace Keypad {
 				//Beep
 				Buzzer::buzz(25000);
 			} else {
-				if (std::string(input) == std::string("0001")) {
+				if (std::string(input) == std::string("0999")) {
+					Utils::shutdownPi();
+				} else if (std::string(input) == std::string("0001")) {
 					Buzzer::buzz(25000);
 					reset();
 					LCD::writeMessage("Loading users...", 0, 0);
