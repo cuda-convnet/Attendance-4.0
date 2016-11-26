@@ -1,5 +1,6 @@
 #include "LCD.h"
 #include "ANSI.h"
+#include "State.h"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -200,6 +201,11 @@ namespace LCD {
 		printf(LOADING "Destroying LCD...");
 
 		clear();
+
+		if (State::didTriggerShutdown) {
+			writeMessage("Wait a few secs ", 0, 0);
+			writeMessage("then pull power ", 1, 0);
+		}
 
 		bcm2835_i2c_end();
 

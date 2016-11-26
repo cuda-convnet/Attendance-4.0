@@ -3,6 +3,7 @@
 #include "ANSI.h"
 #include "Buzzer.h"
 #include "LCD.h"
+#include "State.h"
 
 #include <curl/curl.h>
 #include <fstream>
@@ -302,6 +303,11 @@ namespace Utils {
 	}
 
 	void shutdownPi() {
+		State::didTriggerShutdown = true;
 		system("shutdown -h now");
+	}
+
+	void restartProgram() {
+		system("killall -q Attendancev4 | service attendancev4 restart &");
 	}
 }

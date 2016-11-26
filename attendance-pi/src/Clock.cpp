@@ -29,6 +29,8 @@ namespace Clock {
 	bool run = true;
 	std::condition_variable cv;
 
+	bool needsInternetTimeSync = true;
+
 	void init() {
 		//Initialize the clock
 		printf(LOADING "Initializing Clock...");
@@ -79,15 +81,23 @@ namespace Clock {
 			if (State::haveEthernet && State::haveWifi) {
 				str += CHAR_ETH;
 				str += CHAR_WIFI;
+				needsInternetTimeSync = false;
 			} else if (State::haveEthernet) {
 				str += ' ';
 				str += CHAR_ETH;
+				needsInternetTimeSync = false;
 			} else if (State::haveWifi) {
 				str += ' ';
 				str += CHAR_WIFI;
+				needsInternetTimeSync = false;
 			} else {
-				str += ' ';
-				str += CHAR_NO_NET;
+				if (needsInternetTimeSync) {
+					str = "               ";
+					str += CHAR_NO_NET;
+				} else {
+					str += ' ';
+					str += CHAR_NO_NET;
+				}
 			}
 			
 			LCD::writeMessage(str, 1, 0);

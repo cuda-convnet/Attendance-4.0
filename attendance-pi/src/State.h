@@ -19,6 +19,7 @@ namespace State {
 	extern State state;
 	extern bool haveEthernet;
 	extern bool haveWifi;
+	extern bool didTriggerShutdown;
 
 	void changeState(State);
 	char* getName(State);

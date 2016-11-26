@@ -12,6 +12,7 @@ namespace State {
 	//Network
 	bool haveEthernet = false;
 	bool haveWifi = false;
+	bool didTriggerShutdown = false;
 
 	void changeState(State s) {
 		//Print the state change

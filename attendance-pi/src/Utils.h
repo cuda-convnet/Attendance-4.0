@@ -24,4 +24,5 @@ namespace Utils {
 	void writeError(std::string);
 
 	void shutdownPi();
+	void restartProgram();
 }

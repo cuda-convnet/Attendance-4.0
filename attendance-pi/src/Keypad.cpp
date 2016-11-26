@@ -130,6 +130,7 @@ namespace Keypad {
 	 *
 	 */
 	void thread() {
+		int resetKeyIterations = 0;
 		//Loop
 		while(run) {
 			//Iterate over each input
@@ -146,6 +147,14 @@ namespace Keypad {
 					//Set state to low
 					keystate[i] = LOW;
 				}
+			}
+			if (keystate[11] == HIGH && keystate[10] == HIGH) {
+				resetKeyIterations++;
+				if (resetKeyIterations > 2000) {
+					Utils::restartProgram();
+				}
+			} else {
+				resetKeyIterations = 0;
 			}
 			//Give the processor a bit of time
 			usleep(2000);
@@ -184,6 +193,8 @@ namespace Keypad {
 			reset();
 			//Beep
 			Buzzer::buzz(25000);
+			usleep(25000);
+			Buzzer::buzz(25000);
 			printf(INFO "Cleared the display\n");
 			State::changeState(State::READY);
 			return;
@@ -194,8 +205,11 @@ namespace Keypad {
 				printf(WARN "Not enough digits\n");
 				//Beep
 				Buzzer::buzz(25000);
+				usleep(25000);
+				Buzzer::buzz(25000);
 			} else {
 				if (std::string(input) == std::string("0999")) {
+					LCD::writeMessage("Shutting down...", 0, 0);
 					Utils::shutdownPi();
 				} else if (std::string(input) == std::string("0001")) {
 					Buzzer::buzz(25000);

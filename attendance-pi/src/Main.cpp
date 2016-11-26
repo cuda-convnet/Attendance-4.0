@@ -66,7 +66,6 @@ int main() {
 	fflush(stderr);
 
 	State::changeState(State::NO_INTERNET);
-	bool usersNeedUpdate = false;
 	std::unique_lock<std::mutex> lk(m);
 
 	while (true) {
@@ -89,22 +88,22 @@ int main() {
 			State::haveEthernet = ethernet;
 
 			if (State::state == State::NO_INTERNET) {
-				if (usersNeedUpdate) {
+				if (Utils::hasInternetConnectivity()) {
 					LCD::writeMessage("Loading users...", 0, 0);
 					if (UserHandler::update()) {
-						usersNeedUpdate = false;
 						State::changeState(State::READY);
 						Clock::wakeup();
+					} else {
+						LCD::writeMessage("Connecting...   ", 0, 0);
 					}
 				} else {
-					State::changeState(State::READY);
-					Clock::wakeup();
+					LCD::writeMessage("Connecting...   ", 0, 0);
 				}
 			}
 		}
 
-		// wait 5 secs until we poll again, or until interrupted by a signal
-		cv.wait_for(lk, std::chrono::seconds(5));
+		// wait 1 sec until we poll again, or until interrupted by a signal
+		cv.wait_for(lk, std::chrono::seconds(1));
 		if (!running) {
 			// interrupted, time to clean up and exit
 			break;
