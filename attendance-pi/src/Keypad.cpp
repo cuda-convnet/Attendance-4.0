@@ -5,6 +5,7 @@
 #include "LCD.h"
 #include "Buzzer.h"
 #include "UserHandler.h"
+#include "Utils.h"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -129,6 +130,7 @@ namespace Keypad {
 	 *
 	 */
 	void thread() {
+		int resetKeyIterations = 0;
 		//Loop
 		while(run) {
 			//Iterate over each input
@@ -145,6 +147,14 @@ namespace Keypad {
 					//Set state to low
 					keystate[i] = LOW;
 				}
+			}
+			if (keystate[11] == HIGH && keystate[10] == HIGH) {
+				resetKeyIterations++;
+				if (resetKeyIterations > 2000) {
+					Utils::restartProgram();
+				}
+			} else {
+				resetKeyIterations = 0;
 			}
 			//Give the processor a bit of time
 			usleep(2000);
@@ -172,7 +182,7 @@ namespace Keypad {
 			State::changeState(State::INPUT);
 			//Clear the first line of the display
 			LCD::writeMessage("                ",0,0);
-		} else if(State::state != State::INPUT) {
+		} else if(State::state != State::INPUT && State::state != State::INPUT_ASSIGN_RFID) {
 			//Not allowed
 			printf(WARN "Input received during illegal state\n");
 			return;
@@ -183,7 +193,11 @@ namespace Keypad {
 			reset();
 			//Beep
 			Buzzer::buzz(25000);
+			usleep(25000);
+			Buzzer::buzz(25000);
 			printf(INFO "Cleared the display\n");
+			State::changeState(State::READY);
+			return;
 		} else if(key == '#') {	//Check if this is the submit command
 			//Check he number of digits
 			if(ipos < 4) {
@@ -191,19 +205,46 @@ namespace Keypad {
 				printf(WARN "Not enough digits\n");
 				//Beep
 				Buzzer::buzz(25000);
-			} else {
-				//Trigger the event
-				UserHandler::triggerPin(input);
-				//Beep
+				usleep(25000);
 				Buzzer::buzz(25000);
-				//Sleep for 1 second
-				usleep(1000000);
-				//Clear the display
-				reset();
-				//Change the state back to ready
-				State::changeState(State::READY);
-				//Return
-				return;
+			} else {
+				if (std::string(input) == std::string("0999")) {
+					LCD::writeMessage("Shutting down...", 0, 0);
+					Utils::shutdownPi();
+				} else if (std::string(input) == std::string("0001")) {
+					Buzzer::buzz(25000);
+					reset();
+					LCD::writeMessage("Loading users...", 0, 0);
+					UserHandler::update();
+					State::changeState(State::READY);
+					return;
+				} else if (std::string(input) == std::string("0000")) {
+					Buzzer::buzz(25000);
+					State::changeState(State::INPUT_ASSIGN_RFID);
+					reset();
+					LCD::writeMessage("PIN:  ", 0, 0);
+				} else if (State::state == State::INPUT_ASSIGN_RFID) {
+					State::changeState(State::READ_ASSIGN_RFID);
+					for (int i = 0; i < sizeof(input) / sizeof(char); i++) {
+						State::assignRfidPin[i] = input[i];
+					}
+					reset();
+					LCD::writeMessage("Tap RFID  ", 0, 0);
+					return;
+				} else {
+					//Trigger the event
+					UserHandler::triggerPin(input);
+					//Beep
+					Buzzer::buzz(25000);
+					//Sleep for 1 second
+					usleep(1000000);
+					//Clear the display
+					reset();
+					//Change the state back to ready
+					State::changeState(State::READY);
+					//Return
+					return;
+				}
 			}
 		} else if(ipos > 3) {	//Check the number of digits
 			//Not allowed - too many digits

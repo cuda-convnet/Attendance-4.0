@@ -1,3 +1,5 @@
+#include "vs-intellisense-fix.hpp"
+
 #include "Main.h"
 #include "LCD.h"
 #include "Buzzer.h"
@@ -5,9 +7,9 @@
 #include "RFID.h"
 #include "Clock.h"
 #include "UserHandler.h"
+#include "Utils.h"
 
 #include "State.h"
-#include "HttpSend.h"
 #include "ANSI.h"
 
 #include <stdio.h>
@@ -17,8 +19,27 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <signal.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+std::mutex m;
+std::condition_variable cv;
+bool running = true;
+
+void catch_signal(int signum) {
+	// notify main thread to die
+	running = false;
+	cv.notify_one();
+}
 
 int main() {
+	// add signal handlers
+	struct sigaction action1 = {};
+	action1.sa_handler = catch_signal;
+	sigaction(SIGTERM, &action1, NULL);
+	sigaction(SIGINT, &action1, NULL);
 	//Change state
 	State::changeState(State::INIT);
 	//Initialize components
@@ -31,20 +52,65 @@ int main() {
 		Keypad::init();
 		RFID::init();
 		Clock::init();
+
 		UserHandler::init();
 	} catch(const std::exception& e) {
 		//Catch the error
+		printf("\n\n");
 		printf(FAIL "%s\n" RESET, e.what());
 		State::changeState(State::ERROR);
 		exit(0);
 	}
 
-	//Read
-	State::changeState(State::READY);
-	printf(INFO "Ready!\n");
+	fflush(stdout);
+	fflush(stderr);
 
-	usleep(600000000);
+	State::changeState(State::NO_INTERNET);
+	std::unique_lock<std::mutex> lk(m);
 
+	while (true) {
+		std::vector<Utils::ConnectionState> cs = Utils::getConnectionState();
+		if (cs.size() == 0) {
+			State::haveWifi = false;
+			State::haveEthernet = false;
+			State::changeState(State::NO_INTERNET);
+			Clock::wakeup();
+		} else {
+			bool wifi = false, ethernet = false;
+			for (int i = 0; i < cs.size(); i++) {
+				if (cs[i].connectionType == Utils::WIFI) {
+					wifi = true;
+				} else if (cs[i].connectionType == Utils::ETHERNET) {
+					ethernet = true;
+				}
+			}
+			State::haveWifi = wifi;
+			State::haveEthernet = ethernet;
+
+			if (State::state == State::NO_INTERNET) {
+				if (Utils::hasInternetConnectivity()) {
+					LCD::writeMessage("Loading users...", 0, 0);
+					if (UserHandler::update()) {
+						State::changeState(State::READY);
+						Clock::wakeup();
+					} else {
+						LCD::writeMessage("Connecting...   ", 0, 0);
+					}
+				} else {
+					LCD::writeMessage("Connecting...   ", 0, 0);
+				}
+			}
+		}
+
+		// wait 1 sec until we poll again, or until interrupted by a signal
+		cv.wait_for(lk, std::chrono::seconds(1));
+		if (!running) {
+			// interrupted, time to clean up and exit
+			break;
+		}
+	}
+
+	lk.release();
 
 	//Clean up time
 	State::changeState(State::STOPPING);
@@ -100,6 +166,10 @@ namespace Main {
 		if(getenv("API_TRIGGER") == nullptr) {
 			throw std::runtime_error(
 					"Environment variable \"API_TRIGGER\" is not set");
+		}
+		if (getenv("API_ASSIGN") == nullptr) {
+			throw std::runtime_error(
+				"Environment variable \"API_ASSIGN\" is not set");
 		}
 
 		printf(OKAY "\n");

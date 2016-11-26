@@ -7,5 +7,6 @@ namespace UserHandler {
 
 	void triggerPin(char*);
 	void triggerRfid(const char*);
-	void update();
+	bool update();
+	void assignRfidToPin(char* pin, const char* rfid);
 }

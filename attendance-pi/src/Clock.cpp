@@ -1,10 +1,16 @@
+#include "vs-intellisense-fix.hpp"
+
 #include "Clock.h"
 #include "LCD.h"
 #include "State.h"
 #include "ANSI.h"
+#include "Utils.h"
 
 #include <stdio.h>
 #include <thread>
+#include <mutex>
+#include <chrono>
+#include <condition_variable>
 #include <ctime>
 #include <unistd.h>
 #include <string>
@@ -18,8 +24,12 @@ namespace Clock {
 
 	///Clock thead
 	std::thread cThread;
+	std::mutex m;
 	///Clock thread termination condition
 	bool run = true;
+	std::condition_variable cv;
+
+	bool needsInternetTimeSync = true;
 
 	void init() {
 		//Initialize the clock
@@ -40,6 +50,7 @@ namespace Clock {
 
 		//Instruct the thread to terminate
 		run = false;
+		cv.notify_one();
 		//Join the thread
 		cThread.join();
 
@@ -51,17 +62,49 @@ namespace Clock {
 		//Current time variable
 		std::string date;
 
+		std::unique_lock<std::mutex> lk(m);
+
 		//Loop
 		while(run) {
 			//Check if allowed state
-			if(State::state != State::READY) { sleep(1); continue; }
+			if(State::state != State::READY && State::state != State::NO_INTERNET) {
+				cv.wait_for(lk, std::chrono::seconds(1));
+				continue;
+			}
 			//Get formatted date
 			date = getDate();
+
 			//Write the message
-			LCD::writeMessage(date,1,0);
+			std::string str;
+			str += date;
+			str += "  ";
+			if (State::haveEthernet && State::haveWifi) {
+				str += CHAR_ETH;
+				str += CHAR_WIFI;
+				needsInternetTimeSync = false;
+			} else if (State::haveEthernet) {
+				str += ' ';
+				str += CHAR_ETH;
+				needsInternetTimeSync = false;
+			} else if (State::haveWifi) {
+				str += ' ';
+				str += CHAR_WIFI;
+				needsInternetTimeSync = false;
+			} else {
+				if (needsInternetTimeSync) {
+					str = "               ";
+					str += CHAR_NO_NET;
+				} else {
+					str += ' ';
+					str += CHAR_NO_NET;
+				}
+			}
+			
+			LCD::writeMessage(str, 1, 0);
 			//Delay
-			sleep(10);
+			cv.wait_for(lk, std::chrono::seconds(10));
 		}
+		lk.release();
 	}
 
 	std::string getDate() {
@@ -72,7 +115,11 @@ namespace Clock {
 		//Calculate time
 		tstruct = *std::localtime(&now);
 		//Convert to string
-		std::strftime(buf, sizeof(buf), "%m/%d      %I:%M", &tstruct);
+		std::strftime(buf, sizeof(buf), "%m/%d  %I:%M", &tstruct);
 		return buf;
+	}
+
+	void wakeup() {
+		cv.notify_one();
 	}
 }
