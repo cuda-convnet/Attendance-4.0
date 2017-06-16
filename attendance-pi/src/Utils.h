@@ -2,6 +2,7 @@
 
 #include "json.hpp"
 #include <vector>
+#include <string>
 
 namespace Utils {
 	typedef enum {
@@ -13,6 +14,7 @@ namespace Utils {
 	typedef struct {
 		ConnectionType connectionType;
 		unsigned char dBm;
+		std::string ip;
 	} ConnectionState;
 
 	nlohmann::json jsonGetRequest(const char*);

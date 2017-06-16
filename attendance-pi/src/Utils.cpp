@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <linux/wireless.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <errno.h>
 
 using namespace std;
@@ -49,11 +50,13 @@ namespace Utils {
 
 		if (rv == -1) {
 			printf(WARN "ioctl() error: %d\n", errno);
+			close(sock);
 			return connectionState;
 		}
 
 		if (!((if_req.ifr_flags & IFF_UP) && (if_req.ifr_flags & IFF_RUNNING))) {
 			// it's not up
+			close(sock);
 			return connectionState;
 		}
 
@@ -111,6 +114,17 @@ namespace Utils {
 			ConnectionState cs = checkInterface(ifa->ifa_name);
 			if (cs.connectionType != NO_CONNECTION) {
 				// this is a network that is up
+				struct ifreq ifr = {};
+				int fd = socket(AF_INET, SOCK_DGRAM, 0);
+				if (fd >= 0) {
+					ifr.ifr_addr.sa_family = AF_INET;
+					strncpy(ifr.ifr_name, ifa->ifa_name, IFNAMSIZ - 1);
+					int res = ioctl(fd, SIOCGIFADDR, &ifr);
+					if (res >= 0) {
+						cs.ip = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
+					}
+					close(fd);
+				}
 				retval.push_back(cs);
 			}
 		}
@@ -308,6 +322,8 @@ namespace Utils {
 	}
 
 	void restartProgram() {
-		system("killall -q Attendancev4 | service attendancev4 restart &");
+		LCD::writeMessage("Force restart...", 0, 0);
+		system("service attendancev4 restart &");
+		std::exit(1);
 	}
 }

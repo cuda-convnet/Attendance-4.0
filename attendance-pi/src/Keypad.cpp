@@ -211,12 +211,21 @@ namespace Keypad {
 				if (std::string(input) == std::string("0999")) {
 					LCD::writeMessage("Shutting down...", 0, 0);
 					Utils::shutdownPi();
+					return;
 				} else if (std::string(input) == std::string("0001")) {
 					Buzzer::buzz(25000);
 					reset();
 					LCD::writeMessage("Loading users...", 0, 0);
 					UserHandler::update();
 					State::changeState(State::READY);
+					return;
+				} else if(std::string(input) == std::string("0002")) {
+					std::vector<Utils::ConnectionState> states = Utils::getConnectionState();
+					int row = 0;
+					for (auto it = states.begin(); it != states.end(); ++it) {
+						LCD::writeMessage(it->ip, row, 0);
+						row++;
+					}
 					return;
 				} else if (std::string(input) == std::string("0000")) {
 					Buzzer::buzz(25000);
